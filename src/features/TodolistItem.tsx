@@ -1,18 +1,20 @@
-import type { Task } from '@/app/App'
+import type { FilterValues, Task } from '@/app/App'
 import { Button } from '@/common/Button/Button'
 
 type Props = {
   title: string
   tasks: Task[]
+  deleteTask: (taskId: Task['id']) => void
+  changeFilter: (filter: FilterValues) => void
 }
 
-export const TodolistItem = ({ title, tasks }: Props) => {
+export const TodolistItem = ({ title, tasks, deleteTask, changeFilter }: Props) => {
   return (
     <div>
       <h3>{title}</h3>
       <div>
         <input />
-        <Button title={'+'} />
+        <Button title={'+'} onClick={() => {}} />
       </div>
       {tasks.length === 0 ? (
         <p>Тасок нет</p>
@@ -23,15 +25,16 @@ export const TodolistItem = ({ title, tasks }: Props) => {
               <li key={task.id}>
                 <input type="checkbox" checked={task.isDone} />
                 <span>{task.title}</span>
+                <Button title={'X'} onClick={() => deleteTask(task.id)} />
               </li>
             )
           })}
         </ul>
       )}
       <div>
-        <Button title={'All'} />
-        <Button title={'Active'} />
-        <Button title={'Completed'} />
+        <Button title={'All'} onClick={() => changeFilter('all')} />
+        <Button title={'Active'} onClick={() => changeFilter('active')} />
+        <Button title={'Completed'} onClick={() => changeFilter('completed')} />
       </div>
     </div>
   )
