@@ -18,5 +18,19 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      'no-console': ['warn', { allow: ['warn', 'error'] }], // Предупреждать о console.log, но разрешить warn и error
+      'no-debugger': 'warn', // предупреждение о debugger
+      'no-unused-vars': 'off', // Отключаем базовое правило (неиспользуемые переменные)
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_', // Игнорировать параметры, начинающиеся с _
+          varsIgnorePattern: '^_', // Игнорировать переменные, начинающиеся с _
+          caughtErrorsIgnorePattern: '^_', // Игнорировать ошибки в catch, начинающиеся с _
+        },
+      ],
+      '@typescript-eslint/no-explicit-any': 'warn', // any запрещён
+    },
   },
 ])
