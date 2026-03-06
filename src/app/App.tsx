@@ -1,7 +1,7 @@
 import { v1 } from 'uuid'
 import styles from './App.module.css'
 import { TodolistItem } from '@/features/TodolistItem'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 export type Task = {
   id: string
@@ -36,21 +36,36 @@ export const App = () => {
 
   const filteredTasks = useMemo(() => getFilteredTasks(tasks, filter), [tasks, filter])
 
-  const deleteTask = (taskId: Task['id']) => {
-    const filteredTasks = tasks.filter((task) => {
-      return task.id !== taskId
-    })
-    setTasks(filteredTasks)
-  }
+  const deleteTask = useCallback(
+    (taskId: Task['id']) => {
+      const filteredTasks = tasks.filter((task) => task.id !== taskId)
+      setTasks(filteredTasks)
+    },
+    [tasks],
+  )
 
-  const changeFilter = (filter: FilterValues) => {
-    console.log('tuta')
+  const changeFilter = useCallback((filter: FilterValues) => {
     setFilter(filter)
-  }
+  }, [])
+
+  const createTask = useCallback(
+    (title: Task['title']) => {
+      const newTask = { id: v1(), title, isDone: false }
+      const updatedTasks = [newTask, ...tasks]
+      setTasks(updatedTasks)
+    },
+    [tasks],
+  )
 
   return (
     <div className={styles.app}>
-      <TodolistItem title="What to learn" tasks={filteredTasks} deleteTask={deleteTask} changeFilter={changeFilter} />
+      <TodolistItem
+        title="What to learn"
+        tasks={filteredTasks}
+        deleteTask={deleteTask}
+        changeFilter={changeFilter}
+        createTask={createTask}
+      />
     </div>
   )
 }
