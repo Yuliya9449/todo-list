@@ -38,8 +38,7 @@ export const App = () => {
 
   const deleteTask = useCallback(
     (taskId: Task['id']) => {
-      const filteredTasks = tasks.filter((task) => task.id !== taskId)
-      setTasks(filteredTasks)
+      setTasks(tasks.filter((task) => task.id !== taskId))
     },
     [tasks],
   )
@@ -57,6 +56,13 @@ export const App = () => {
     [tasks],
   )
 
+  const changeTaskStatus = useCallback(
+    (taskId: Task['id'], isDone: Task['isDone']) => {
+      setTasks(tasks.map((t) => (t.id === taskId ? { ...t, isDone } : t)))
+    },
+    [tasks],
+  )
+
   return (
     <div className={styles.app}>
       <TodolistItem
@@ -65,6 +71,7 @@ export const App = () => {
         deleteTask={deleteTask}
         changeFilter={changeFilter}
         createTask={createTask}
+        changeTaskStatus={changeTaskStatus}
       />
     </div>
   )
