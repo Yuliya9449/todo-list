@@ -10,9 +10,18 @@ type Props = {
   changeFilter: (filter: FilterValues) => void
   createTask: (title: Task['title']) => void
   changeTaskStatus: (taskId: Task['id'], isDone: Task['isDone']) => void
+  filter: FilterValues
 }
 
-export const TodolistItem = ({ title, tasks, deleteTask, changeFilter, createTask, changeTaskStatus }: Props) => {
+export const TodolistItem = ({
+  title,
+  tasks,
+  deleteTask,
+  changeFilter,
+  createTask,
+  changeTaskStatus,
+  filter,
+}: Props) => {
   const [taskTitle, setTaskTitle] = useState('')
   const [error, setError] = useState<string | null>(null)
 
@@ -65,7 +74,10 @@ export const TodolistItem = ({ title, tasks, deleteTask, changeFilter, createTas
             }
 
             return (
-              <li key={task.id}>
+              <li
+                key={task.id}
+                className={task.isDone ? styles.isDone : ''}
+              >
                 <input
                   type="checkbox"
                   onChange={changeTaskStatusHandler}
@@ -83,14 +95,17 @@ export const TodolistItem = ({ title, tasks, deleteTask, changeFilter, createTas
       )}
       <div>
         <Button
+          isActive={filter === 'all'}
           title={'All'}
           onClick={() => changeFilter('all')}
         />
         <Button
+          isActive={filter === 'active'}
           title={'Active'}
           onClick={() => changeFilter('active')}
         />
         <Button
+          isActive={filter === 'completed'}
           title={'Completed'}
           onClick={() => changeFilter('completed')}
         />

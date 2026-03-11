@@ -1,8 +1,18 @@
+import styles from './Button.module.css'
+
 type Props = {
   title: string
-  onClick: () => void
+  onClick?: () => void
+  isActive?: boolean
 }
 
-export const Button = ({ title, onClick }: Props) => {
-  return <button onClick={onClick}>{title}</button>
+export const Button = ({ title, onClick, isActive }: Props) => {
+  return (
+    <button
+      className={isActive ? styles.activeFilter : ''}
+      onClick={onClick}
+    >
+      {title}
+    </button>
+  )
 }
