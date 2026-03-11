@@ -1,6 +1,7 @@
+import styles from './TodolistItem.module.css'
 import type { FilterValues, Task } from '@/app/App'
 import { Button } from '@/common/Button/Button'
-import { type ChangeEvent, type KeyboardEvent, useRef } from 'react'
+import { type ChangeEvent, type KeyboardEvent, useState } from 'react'
 
 type Props = {
   title: Task['title']
@@ -12,19 +13,28 @@ type Props = {
 }
 
 export const TodolistItem = ({ title, tasks, deleteTask, changeFilter, createTask, changeTaskStatus }: Props) => {
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [taskTitle, setTaskTitle] = useState('')
+  const [error, setError] = useState<string | null>(null)
 
-  const createTaskHandler = () => {
-    if (inputRef.current) {
-      createTask(inputRef.current.value)
-      inputRef.current.value = ''
+  const createTaskHandler = (taskTitle: Task['title']) => {
+    const trimmedTitle = taskTitle.trim()
+    if (trimmedTitle) {
+      createTask(trimmedTitle)
+      setTaskTitle('')
+    } else {
+      setError('Title is required')
     }
   }
 
   const createTaskOnEnterHandler = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
-      createTaskHandler()
+      createTaskHandler(taskTitle)
     }
+  }
+
+  const changeTaskTitleHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    setTaskTitle(e.currentTarget.value)
+    setError(null)
   }
 
   return (
@@ -32,13 +42,17 @@ export const TodolistItem = ({ title, tasks, deleteTask, changeFilter, createTas
       <h3>{title}</h3>
       <div>
         <input
-          ref={inputRef}
+          className={error ? styles.error : ''}
+          value={taskTitle}
+          onChange={changeTaskTitleHandler}
           onKeyDown={createTaskOnEnterHandler}
         />
+
         <Button
           title={'+'}
-          onClick={createTaskHandler}
+          onClick={() => createTaskHandler(taskTitle)}
         />
+        {error && <div className={styles.errorMessage}>{error}</div>}
       </div>
       {tasks.length === 0 ? (
         <p>Тасок нет</p>
