@@ -3,6 +3,12 @@ import styles from './App.module.css'
 import { TodolistItem } from '@/features/TodolistItem'
 import { useCallback, useMemo, useState } from 'react'
 
+export type Todolist = {
+  id: string
+  title: string
+  filter: FilterValues
+}
+
 export type Task = {
   id: string
   title: string
@@ -23,6 +29,11 @@ const getFilteredTasks = (tasks: Task[], filter: FilterValues): Task[] => {
 }
 
 export const App = () => {
+  const [todolists, setTodolists] = useState<Todolist[]>([
+    { id: v1(), title: 'What to learn', filter: 'all' },
+    { id: v1(), title: 'What to buy', filter: 'all' },
+  ])
+
   const [tasks, setTasks] = useState<Task[]>([
     { id: v1(), title: 'HTML&CSS', isDone: true },
     { id: v1(), title: 'JS', isDone: true },
@@ -65,15 +76,19 @@ export const App = () => {
 
   return (
     <div className={styles.app}>
-      <TodolistItem
-        title="What to learn"
-        tasks={filteredTasks}
-        deleteTask={deleteTask}
-        changeFilter={changeFilter}
-        createTask={createTask}
-        changeTaskStatus={changeTaskStatus}
-        filter={filter}
-      />
+      {todolists.map((todolist) => {
+        return (
+          <TodolistItem
+            key={todolist.id}
+            todolist={todolist}
+            tasks={filteredTasks}
+            deleteTask={deleteTask}
+            changeFilter={changeFilter}
+            createTask={createTask}
+            changeTaskStatus={changeTaskStatus}
+          />
+        )
+      })}
     </div>
   )
 }

@@ -1,27 +1,18 @@
 import styles from './TodolistItem.module.css'
-import type { FilterValues, Task } from '@/app/App'
-import { Button } from '@/common/Button/Button'
+import type { FilterValues, Task, Todolist } from '@/app/App'
 import { type ChangeEvent, type KeyboardEvent, useState } from 'react'
+import { Button } from '@/common/components/Button/Button'
 
 type Props = {
-  title: Task['title']
+  todolist: Todolist
   tasks: Task[]
   deleteTask: (taskId: Task['id']) => void
   changeFilter: (filter: FilterValues) => void
   createTask: (title: Task['title']) => void
   changeTaskStatus: (taskId: Task['id'], isDone: Task['isDone']) => void
-  filter: FilterValues
 }
 
-export const TodolistItem = ({
-  title,
-  tasks,
-  deleteTask,
-  changeFilter,
-  createTask,
-  changeTaskStatus,
-  filter,
-}: Props) => {
+export const TodolistItem = ({ todolist, tasks, deleteTask, changeFilter, createTask, changeTaskStatus }: Props) => {
   const [taskTitle, setTaskTitle] = useState('')
   const [error, setError] = useState<string | null>(null)
 
@@ -48,7 +39,7 @@ export const TodolistItem = ({
 
   return (
     <div>
-      <h3>{title}</h3>
+      <h3>{todolist.title}</h3>
       <div>
         <input
           className={error ? styles.error : ''}
@@ -95,17 +86,17 @@ export const TodolistItem = ({
       )}
       <div>
         <Button
-          isActive={filter === 'all'}
+          isActive={todolist.filter === 'all'}
           title={'All'}
           onClick={() => changeFilter('all')}
         />
         <Button
-          isActive={filter === 'active'}
+          isActive={todolist.filter === 'active'}
           title={'Active'}
           onClick={() => changeFilter('active')}
         />
         <Button
-          isActive={filter === 'completed'}
+          isActive={todolist.filter === 'completed'}
           title={'Completed'}
           onClick={() => changeFilter('completed')}
         />
