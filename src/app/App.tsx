@@ -1,7 +1,7 @@
 import { v1 } from 'uuid'
 import styles from './App.module.css'
 import { TodolistItem } from '@/features/TodolistItem'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 export type Todolist = {
   id: string
@@ -43,9 +43,7 @@ export const App = () => {
     { id: v1(), title: 'RTK query', isDone: false },
   ])
 
-  const [filter, setFilter] = useState<FilterValues>('all')
-
-  const filteredTasks = useMemo(() => getFilteredTasks(tasks, filter), [tasks, filter])
+  // const filteredTasks = useMemo(() => getFilteredTasks(tasks, filter), [tasks, filter])
 
   const deleteTask = useCallback(
     (taskId: Task['id']) => {
@@ -54,9 +52,12 @@ export const App = () => {
     [tasks],
   )
 
-  const changeFilter = useCallback((filter: FilterValues) => {
-    setFilter(filter)
-  }, [])
+  const changeFilter = useCallback(
+    (todolistId: string, filter: FilterValues) => {
+      setTodolists(todolists.map((t) => (t.id === todolistId ? { ...t, filter } : t)))
+    },
+    [todolists],
+  )
 
   const createTask = useCallback(
     (title: Task['title']) => {
@@ -77,6 +78,8 @@ export const App = () => {
   return (
     <div className={styles.app}>
       {todolists.map((todolist) => {
+        const filteredTasks = getFilteredTasks(tasks, todolist.filter)
+
         return (
           <TodolistItem
             key={todolist.id}

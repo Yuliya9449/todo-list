@@ -7,7 +7,7 @@ type Props = {
   todolist: Todolist
   tasks: Task[]
   deleteTask: (taskId: Task['id']) => void
-  changeFilter: (filter: FilterValues) => void
+  changeFilter: (todolistId: string, filter: FilterValues) => void
   createTask: (title: Task['title']) => void
   changeTaskStatus: (taskId: Task['id'], isDone: Task['isDone']) => void
 }
@@ -35,6 +35,10 @@ export const TodolistItem = ({ todolist, tasks, deleteTask, changeFilter, create
   const changeTaskTitleHandler = (e: ChangeEvent<HTMLInputElement>) => {
     setTaskTitle(e.currentTarget.value)
     setError(null)
+  }
+
+  const changeFilterHandler = (filter: FilterValues) => {
+    changeFilter(todolist.id, filter)
   }
 
   return (
@@ -88,17 +92,17 @@ export const TodolistItem = ({ todolist, tasks, deleteTask, changeFilter, create
         <Button
           isActive={todolist.filter === 'all'}
           title={'All'}
-          onClick={() => changeFilter('all')}
+          onClick={() => changeFilterHandler('all')}
         />
         <Button
           isActive={todolist.filter === 'active'}
           title={'Active'}
-          onClick={() => changeFilter('active')}
+          onClick={() => changeFilterHandler('active')}
         />
         <Button
           isActive={todolist.filter === 'completed'}
           title={'Completed'}
-          onClick={() => changeFilter('completed')}
+          onClick={() => changeFilterHandler('completed')}
         />
       </div>
     </div>
