@@ -51,50 +51,44 @@ export const App = () => {
     ],
   })
 
-  const deleteTask = useCallback(
-    (payload: { todolistId: Todolist['id']; taskId: Task['id'] }) => {
-      const { todolistId, taskId } = payload
-      setTasks({
-        ...tasks,
-        [todolistId]: tasks[todolistId].filter((t) => t.id !== taskId),
-      })
-    },
-    [tasks],
-  )
+  const deleteTask = useCallback((payload: { todolistId: Todolist['id']; taskId: Task['id'] }) => {
+    const { todolistId, taskId } = payload
+    setTasks((prevTasks) => ({
+      ...prevTasks,
+      [todolistId]: prevTasks[todolistId].filter((t) => t.id !== taskId),
+    }))
+  }, [])
 
-  const changeFilter = useCallback(
-    (payload: { todolistId: Todolist['id']; filter: FilterValues }) => {
-      const { todolistId, filter } = payload
-      setTodolists(todolists.map((t) => (t.id === todolistId ? { ...t, filter } : t)))
-    },
-    [todolists],
-  )
+  const changeFilter = useCallback((payload: { todolistId: Todolist['id']; filter: FilterValues }) => {
+    const { todolistId, filter } = payload
+    setTodolists((prevTodos) => prevTodos.map((t) => (t.id === todolistId ? { ...t, filter } : t)))
+  }, [])
 
-  const createTask = useCallback(
-    (payload: { todolistId: Todolist['id']; title: Task['title'] }) => {
-      const { todolistId, title } = payload
-      const newTask = { id: v1(), title, isDone: false }
-      setTasks({ ...tasks, [todolistId]: [newTask, ...tasks[todolistId]] })
-    },
-    [tasks],
-  )
+  const createTask = useCallback((payload: { todolistId: Todolist['id']; title: Task['title'] }) => {
+    const { todolistId, title } = payload
+    const newTask = { id: v1(), title, isDone: false }
+    setTasks((prevTasks) => ({ ...prevTasks, [todolistId]: [newTask, ...prevTasks[todolistId]] }))
+  }, [])
 
   const changeTaskStatus = useCallback(
     (payload: { todolistId: Todolist['id']; taskId: Task['id']; isDone: Task['isDone'] }) => {
       const { todolistId, taskId, isDone } = payload
-      setTasks({ ...tasks, [todolistId]: tasks[todolistId].map((t) => (t.id === taskId ? { ...t, isDone } : t)) })
+      setTasks((prevTasks) => ({
+        ...prevTasks,
+        [todolistId]: prevTasks[todolistId].map((t) => (t.id === taskId ? { ...t, isDone } : t)),
+      }))
     },
-    [tasks],
+    [],
   )
 
-  const deleteTodolist = useCallback(
-    (todolistId: Todolist['id']) => {
-      setTodolists(todolists.filter((todolist) => todolist.id !== todolistId))
-      const { [todolistId]: _, ...rest } = tasks
-      setTasks(rest)
-    },
-    [todolists, tasks],
-  )
+  const deleteTodolist = useCallback((todolistId: Todolist['id']) => {
+    setTodolists((prevTodos) => prevTodos.filter((todolist) => todolist.id !== todolistId))
+
+    setTasks((prevTasks) => {
+      const { [todolistId]: _, ...rest } = prevTasks
+      return rest
+    })
+  }, [])
 
   return (
     <div className={styles.app}>
