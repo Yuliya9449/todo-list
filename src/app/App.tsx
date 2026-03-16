@@ -18,6 +18,8 @@ export type Task = {
   isDone: boolean
 }
 
+export type TasksState = Record<Todolist['id'], Task[]>
+
 export type FilterValues = 'all' | 'active' | 'completed'
 
 const getFilteredTasks = (tasks: Task[], filter: FilterValues): Task[] => {
@@ -37,7 +39,7 @@ export const App = () => {
     { id: todolistId2, title: 'What to buy', filter: 'all' },
   ])
 
-  const [tasks, setTasks] = useState({
+  const [tasks, setTasks] = useState<TasksState>({
     [todolistId1]: [
       { id: v1(), title: 'HTML&CSS', isDone: true },
       { id: v1(), title: 'JS', isDone: true },
@@ -85,6 +87,15 @@ export const App = () => {
     [tasks],
   )
 
+  const deleteTodolist = useCallback(
+    (todolistId: Todolist['id']) => {
+      setTodolists(todolists.filter((todolist) => todolist.id !== todolistId))
+      const { [todolistId]: _, ...rest } = tasks
+      setTasks(rest)
+    },
+    [todolists, tasks],
+  )
+
   return (
     <div className={styles.app}>
       {todolists.map((todolist) => {
@@ -101,6 +112,7 @@ export const App = () => {
             changeFilter={changeFilter}
             createTask={createTask}
             changeTaskStatus={changeTaskStatus}
+            deleteTodolist={deleteTodolist}
           />
         )
       })}

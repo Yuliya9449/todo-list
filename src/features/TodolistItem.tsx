@@ -10,10 +10,11 @@ type Props = {
   changeFilter: (payload: { todolistId: Todolist['id']; filter: FilterValues }) => void
   createTask: (payload: { todolistId: Todolist['id']; title: Task['title'] }) => void
   changeTaskStatus: (payload: { todolistId: Todolist['id']; taskId: Task['id']; isDone: Task['isDone'] }) => void
+  deleteTodolist: (id: Todolist['id']) => void
 }
 
 export const TodolistItem = memo(
-  ({ todolist, tasks, deleteTask, changeFilter, createTask, changeTaskStatus }: Props) => {
+  ({ todolist, tasks, deleteTask, changeFilter, createTask, changeTaskStatus, deleteTodolist }: Props) => {
     const [taskTitle, setTaskTitle] = useState('')
     const [error, setError] = useState<string | null>(null)
 
@@ -42,9 +43,19 @@ export const TodolistItem = memo(
       changeFilter({ todolistId: todolist.id, filter })
     }
 
+    const deleteTodolistHandler = () => {
+      deleteTodolist(todolist.id)
+    }
+
     return (
       <div>
-        <h3>{todolist.title}</h3>
+        <div className={styles.container}>
+          <h3>{todolist.title}</h3>{' '}
+          <Button
+            title={'x'}
+            onClick={deleteTodolistHandler}
+          />
+        </div>
         <div>
           <input
             className={error ? styles.error : ''}
