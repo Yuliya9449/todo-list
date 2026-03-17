@@ -2,6 +2,7 @@ import { v1 } from 'uuid'
 import styles from './App.module.css'
 import { TodolistItem } from '@/features/TodolistItem'
 import { useCallback, useState } from 'react'
+import { CreateItemForm } from '@/common/components/CreateItemForm/CreateItemForm'
 
 const todolistId1 = v1()
 const todolistId2 = v1()
@@ -90,8 +91,15 @@ export const App = () => {
     })
   }, [])
 
+  const createTodolistHandler = useCallback((title: Todolist['title']) => {
+    const newTodolist: Todolist = { id: v1(), title, filter: 'all' }
+    setTodolists((prevTodos) => [newTodolist, ...prevTodos])
+    setTasks((prevTasks) => ({ ...prevTasks, [newTodolist.id]: [] }))
+  }, [])
+
   return (
     <div className={styles.app}>
+      <CreateItemForm onCreateItem={createTodolistHandler} />
       {todolists.map((todolist) => {
         const todolistTasks = tasks[todolist.id]
 

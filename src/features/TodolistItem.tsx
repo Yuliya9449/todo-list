@@ -1,7 +1,8 @@
 import styles from './TodolistItem.module.css'
 import type { FilterValues, Task, Todolist } from '@/app/App'
-import { type ChangeEvent, type KeyboardEvent, memo, useState } from 'react'
+import { type ChangeEvent, memo, useCallback } from 'react'
 import { Button } from '@/common/components/Button/Button'
+import { CreateItemForm } from '@/common/components/CreateItemForm/CreateItemForm'
 
 type Props = {
   todolist: Todolist
@@ -15,37 +16,23 @@ type Props = {
 
 export const TodolistItem = memo(
   ({ todolist, tasks, deleteTask, changeFilter, createTask, changeTaskStatus, deleteTodolist }: Props) => {
-    const [taskTitle, setTaskTitle] = useState('')
-    const [error, setError] = useState<string | null>(null)
+    const changeFilterHandler = useCallback(
+      (filter: FilterValues) => {
+        changeFilter({ todolistId: todolist.id, filter })
+      },
+      [changeFilter, todolist.id],
+    )
 
-    const createTaskHandler = (taskTitle: string) => {
-      const trimmedTitle = taskTitle.trim()
-      if (trimmedTitle) {
-        createTask({ todolistId: todolist.id, title: trimmedTitle })
-        setTaskTitle('')
-      } else {
-        setError('Title is required')
-      }
-    }
-
-    const createTaskOnEnterHandler = (event: KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === 'Enter') {
-        createTaskHandler(taskTitle)
-      }
-    }
-
-    const changeTaskTitleHandler = (e: ChangeEvent<HTMLInputElement>) => {
-      setTaskTitle(e.currentTarget.value)
-      setError(null)
-    }
-
-    const changeFilterHandler = (filter: FilterValues) => {
-      changeFilter({ todolistId: todolist.id, filter })
-    }
-
-    const deleteTodolistHandler = () => {
+    const deleteTodolistHandler = useCallback(() => {
       deleteTodolist(todolist.id)
-    }
+    }, [deleteTodolist, todolist.id])
+
+    const createTaskHandler = useCallback(
+      (title: Task['title']) => {
+        createTask({ todolistId: todolist.id, title })
+      },
+      [createTask, todolist.id],
+    )
 
     return (
       <div>
@@ -56,20 +43,7 @@ export const TodolistItem = memo(
             onClick={deleteTodolistHandler}
           />
         </div>
-        <div>
-          <input
-            className={error ? styles.error : ''}
-            value={taskTitle}
-            onChange={changeTaskTitleHandler}
-            onKeyDown={createTaskOnEnterHandler}
-          />
-
-          <Button
-            title={'+'}
-            onClick={() => createTaskHandler(taskTitle)}
-          />
-          {error && <div className={styles.errorMessage}>{error}</div>}
-        </div>
+        <CreateItemForm onCreateItem={createTaskHandler} />
         {tasks.length === 0 ? (
           <p>Тасок нет</p>
         ) : (
