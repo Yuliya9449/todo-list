@@ -3,6 +3,7 @@ import type { FilterValues, Task, Todolist } from '@/app/App'
 import { type ChangeEvent, memo, useCallback } from 'react'
 import { Button } from '@/common/components/Button/Button'
 import { CreateItemForm } from '@/common/components/CreateItemForm/CreateItemForm'
+import { EditableSpan } from '@/common/components/EditableSpan/EditableSpan'
 
 type Props = {
   todolist: Todolist
@@ -12,10 +13,22 @@ type Props = {
   createTask: (payload: { todolistId: Todolist['id']; title: Task['title'] }) => void
   changeTaskStatus: (payload: { todolistId: Todolist['id']; taskId: Task['id']; isDone: Task['isDone'] }) => void
   deleteTodolist: (id: Todolist['id']) => void
+  changeTodolistTitle: (payload: { todolistId: Todolist['id']; title: Todolist['title'] }) => void
+  changeTaskTitle: (payload: { todolistId: string; taskId: string; title: string }) => void
 }
 
 export const TodolistItem = memo(
-  ({ todolist, tasks, deleteTask, changeFilter, createTask, changeTaskStatus, deleteTodolist }: Props) => {
+  ({
+    todolist,
+    tasks,
+    deleteTask,
+    changeFilter,
+    createTask,
+    changeTaskStatus,
+    deleteTodolist,
+    changeTodolistTitle,
+    changeTaskTitle,
+  }: Props) => {
     const changeFilterHandler = useCallback(
       (filter: FilterValues) => {
         changeFilter({ todolistId: todolist.id, filter })
@@ -34,10 +47,22 @@ export const TodolistItem = memo(
       [createTask, todolist.id],
     )
 
+    const changeTodolistTitleHandler = useCallback(
+      (title: Todolist['title']) => {
+        changeTodolistTitle({ todolistId: todolist.id, title })
+      },
+      [changeTodolistTitle, todolist.id],
+    )
+
     return (
       <div>
         <div className={styles.container}>
-          <h3>{todolist.title}</h3>{' '}
+          <h3>
+            <EditableSpan
+              value={todolist.title}
+              onChangeValue={changeTodolistTitleHandler}
+            />
+          </h3>
           <Button
             title={'x'}
             onClick={deleteTodolistHandler}
@@ -54,6 +79,10 @@ export const TodolistItem = memo(
                 changeTaskStatus({ todolistId: todolist.id, taskId: task.id, isDone: newStatusValue })
               }
 
+              const changeTaskTitleHandler = (title: Task['title']) => {
+                changeTaskTitle({ todolistId: todolist.id, taskId: task.id, title })
+              }
+
               return (
                 <li
                   key={task.id}
@@ -64,7 +93,10 @@ export const TodolistItem = memo(
                     onChange={changeTaskStatusHandler}
                     checked={task.isDone}
                   />
-                  <span>{task.title}</span>
+                  <EditableSpan
+                    value={task.title}
+                    onChangeValue={changeTaskTitleHandler}
+                  />
                   <Button
                     title={'X'}
                     onClick={() => deleteTask({ todolistId: todolist.id, taskId: task.id })}

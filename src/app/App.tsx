@@ -97,6 +97,22 @@ export const App = () => {
     setTasks((prevTasks) => ({ ...prevTasks, [newTodolist.id]: [] }))
   }, [])
 
+  const changeTodolistTitle = useCallback((payload: { todolistId: Todolist['id']; title: Todolist['title'] }) => {
+    const { todolistId, title } = payload
+    setTodolists((prevTodos) => prevTodos.map((t) => (t.id === todolistId ? { ...t, title } : t)))
+  }, [])
+
+  const changeTaskTitle = useCallback(
+    (payload: { todolistId: Todolist['id']; taskId: Task['id']; title: Task['title'] }) => {
+      const { todolistId, taskId, title } = payload
+      setTasks((prevTasks: TasksState) => ({
+        ...prevTasks,
+        [todolistId]: prevTasks[todolistId].map((task) => (task.id === taskId ? { ...task, title } : task)),
+      }))
+    },
+    [],
+  )
+
   return (
     <div className={styles.app}>
       <CreateItemForm onCreateItem={createTodolistHandler} />
@@ -115,6 +131,8 @@ export const App = () => {
             createTask={createTask}
             changeTaskStatus={changeTaskStatus}
             deleteTodolist={deleteTodolist}
+            changeTodolistTitle={changeTodolistTitle}
+            changeTaskTitle={changeTaskTitle}
           />
         )
       })}
