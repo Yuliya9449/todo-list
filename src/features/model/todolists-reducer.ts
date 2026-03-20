@@ -41,6 +41,6 @@ export const todolistsReducer = (state: Todolist[] = [], action: Actions): Todol
 
 type Actions = DeleteTodolistAction | CreateTodolistAction | ChangeTodolistAction
 
-type DeleteTodolistAction = ReturnType<typeof deleteTodolistAC>
-type CreateTodolistAction = ReturnType<typeof createTodolistAC>
+export type DeleteTodolistAction = ReturnType<typeof deleteTodolistAC>
+export type CreateTodolistAction = ReturnType<typeof createTodolistAC>
 type ChangeTodolistAction = ReturnType<typeof changeTodolistAC>
