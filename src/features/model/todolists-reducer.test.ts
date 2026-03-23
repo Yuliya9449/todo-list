@@ -65,7 +65,7 @@ test('should add new todolist at the beginning', () => {
 
 test('correct todolist should change its title', () => {
   const title = 'New title'
-  const endState = todolistsReducer(startState, changeTodolistAC({ id: todolistId2, title }))
+  const endState = todolistsReducer(startState, changeTodolistAC({ todolistId: todolistId2, title }))
 
   expect(endState[0].title).toBe('What to learn')
   expect(endState[1].title).toBe(title)
@@ -73,7 +73,7 @@ test('correct todolist should change its title', () => {
 
 test('should not change title if todolist not found', () => {
   const nonExistentId = 'non-existent-id'
-  const endState = todolistsReducer(startState, changeTodolistAC({ id: nonExistentId, title: 'New' }))
+  const endState = todolistsReducer(startState, changeTodolistAC({ todolistId: nonExistentId, title: 'New' }))
 
   expect(endState).toEqual(startState)
 })
@@ -82,7 +82,7 @@ test('should not change title if todolist not found', () => {
 
 test('correct todolist should change its filter', () => {
   const filter = 'completed'
-  const endState = todolistsReducer(startState, changeTodolistAC({ id: todolistId2, filter }))
+  const endState = todolistsReducer(startState, changeTodolistAC({ todolistId: todolistId2, filter }))
 
   expect(endState[0].filter).toBe('all')
   expect(endState[1].filter).toBe(filter)
@@ -90,7 +90,7 @@ test('correct todolist should change its filter', () => {
 
 test('should not change filter if todolist not found', () => {
   const nonExistentId = 'non-existent-id'
-  const endState = todolistsReducer(startState, changeTodolistAC({ id: nonExistentId, filter: 'active' }))
+  const endState = todolistsReducer(startState, changeTodolistAC({ todolistId: nonExistentId, filter: 'active' }))
 
   expect(endState).toEqual(startState)
 })

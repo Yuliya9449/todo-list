@@ -1,11 +1,14 @@
-import { v1 } from 'uuid'
 import styles from './App.module.css'
 import { TodolistItem } from '@/features/TodolistItem'
-import { useCallback, useState } from 'react'
+import { useCallback, useReducer } from 'react'
 import { CreateItemForm } from '@/common/components/CreateItemForm/CreateItemForm'
-
-const todolistId1 = v1()
-const todolistId2 = v1()
+import {
+  changeTodolistAC,
+  createTodolistAC,
+  deleteTodolistAC,
+  todolistsReducer,
+} from '@/features/model/todolists-reducer'
+import { changeTaskAC, createTaskAC, deleteTaskAC, tasksReducer } from '@/features/model/tasks-reducer'
 
 export type Todolist = {
   id: string
@@ -35,80 +38,48 @@ const getFilteredTasks = (tasks: Task[], filter: FilterValues): Task[] => {
 }
 
 export const App = () => {
-  const [todolists, setTodolists] = useState<Todolist[]>([
-    { id: todolistId1, title: 'What to learn', filter: 'all' },
-    { id: todolistId2, title: 'What to buy', filter: 'all' },
-  ])
+  const [todolists, dispatchToTodolists] = useReducer(todolistsReducer, [])
 
-  const [tasks, setTasks] = useState<TasksState>({
-    [todolistId1]: [
-      { id: v1(), title: 'HTML&CSS', isDone: true },
-      { id: v1(), title: 'JS', isDone: true },
-      { id: v1(), title: 'ReactJS', isDone: false },
-    ],
-    [todolistId2]: [
-      { id: v1(), title: 'Rest API', isDone: true },
-      { id: v1(), title: 'GraphQL', isDone: false },
-    ],
-  })
+  const [tasks, dispatchToTasks] = useReducer(tasksReducer, {})
 
   const deleteTask = useCallback((payload: { todolistId: Todolist['id']; taskId: Task['id'] }) => {
-    const { todolistId, taskId } = payload
-    setTasks((prevTasks) => ({
-      ...prevTasks,
-      [todolistId]: prevTasks[todolistId].filter((t) => t.id !== taskId),
-    }))
+    dispatchToTasks(deleteTaskAC(payload))
   }, [])
 
   const changeFilter = useCallback((payload: { todolistId: Todolist['id']; filter: FilterValues }) => {
-    const { todolistId, filter } = payload
-    setTodolists((prevTodos) => prevTodos.map((t) => (t.id === todolistId ? { ...t, filter } : t)))
+    dispatchToTodolists(changeTodolistAC(payload))
   }, [])
 
   const createTask = useCallback((payload: { todolistId: Todolist['id']; title: Task['title'] }) => {
-    const { todolistId, title } = payload
-    const newTask = { id: v1(), title, isDone: false }
-    setTasks((prevTasks) => ({ ...prevTasks, [todolistId]: [newTask, ...prevTasks[todolistId]] }))
+    dispatchToTasks(createTaskAC(payload))
   }, [])
 
   const changeTaskStatus = useCallback(
     (payload: { todolistId: Todolist['id']; taskId: Task['id']; isDone: Task['isDone'] }) => {
-      const { todolistId, taskId, isDone } = payload
-      setTasks((prevTasks) => ({
-        ...prevTasks,
-        [todolistId]: prevTasks[todolistId].map((t) => (t.id === taskId ? { ...t, isDone } : t)),
-      }))
+      dispatchToTasks(changeTaskAC(payload))
     },
     [],
   )
 
   const deleteTodolist = useCallback((todolistId: Todolist['id']) => {
-    setTodolists((prevTodos) => prevTodos.filter((todolist) => todolist.id !== todolistId))
-
-    setTasks((prevTasks) => {
-      const { [todolistId]: _, ...rest } = prevTasks
-      return rest
-    })
+    const action = deleteTodolistAC({ todolistId })
+    dispatchToTodolists(action)
+    dispatchToTasks(action)
   }, [])
 
   const createTodolistHandler = useCallback((title: Todolist['title']) => {
-    const newTodolist: Todolist = { id: v1(), title, filter: 'all' }
-    setTodolists((prevTodos) => [newTodolist, ...prevTodos])
-    setTasks((prevTasks) => ({ ...prevTasks, [newTodolist.id]: [] }))
+    const action = createTodolistAC(title)
+    dispatchToTodolists(action)
+    dispatchToTasks(action)
   }, [])
 
   const changeTodolistTitle = useCallback((payload: { todolistId: Todolist['id']; title: Todolist['title'] }) => {
-    const { todolistId, title } = payload
-    setTodolists((prevTodos) => prevTodos.map((t) => (t.id === todolistId ? { ...t, title } : t)))
+    dispatchToTodolists(changeTodolistAC(payload))
   }, [])
 
   const changeTaskTitle = useCallback(
     (payload: { todolistId: Todolist['id']; taskId: Task['id']; title: Task['title'] }) => {
-      const { todolistId, taskId, title } = payload
-      setTasks((prevTasks: TasksState) => ({
-        ...prevTasks,
-        [todolistId]: prevTasks[todolistId].map((task) => (task.id === taskId ? { ...task, title } : task)),
-      }))
+      dispatchToTasks(changeTaskAC(payload))
     },
     [],
   )
@@ -116,7 +87,7 @@ export const App = () => {
   return (
     <div className={styles.app}>
       <CreateItemForm onCreateItem={createTodolistHandler} />
-      {todolists.map((todolist) => {
+      {todolists?.map((todolist) => {
         const todolistTasks = tasks[todolist.id]
 
         const filteredTasks = getFilteredTasks(todolistTasks, todolist.filter)
