@@ -1,17 +1,17 @@
-import { beforeEach, test, expect } from 'vitest'
+import { beforeEach, expect, test } from 'vitest'
 import {
   changeTodolistAC,
   createTodolistAC,
   deleteTodolistAC,
   todolistsReducer,
 } from '@/features/model/todolists-reducer'
-import { v1 } from 'uuid'
 import type { Todolist } from '@/app/App'
+import { nanoid } from '@reduxjs/toolkit'
 
 let startState: Todolist[]
 
-const todolistId1 = v1()
-const todolistId2 = v1()
+const todolistId1 = nanoid()
+const todolistId2 = nanoid()
 
 beforeEach(() => {
   startState = [
