@@ -1,72 +1,62 @@
 import type { Task, TasksState, Todolist } from '@/app/App'
-import { type CreateTodolistAction, type DeleteTodolistAction } from '@/features/model/todolists-reducer'
-import { v1 } from 'uuid'
+import { createTodolistAC, deleteTodolistAC } from '@/features/model/todolists-reducer'
+import { createAction, createReducer, nanoid } from '@reduxjs/toolkit'
 
-export const deleteTaskAC = (payload: { todolistId: Todolist['id']; taskId: Task['id'] }) =>
-  ({
-    type: 'tasks/deleteTask',
-    payload,
-  }) as const
+export const deleteTaskAC = createAction<{ todolistId: Todolist['id']; taskId: Task['id'] }>('tasks/deleteTask')
 
-export const createTaskAC = (payload: { todolistId: Todolist['id']; title: Task['title'] }) => {
-  const newTask = { id: v1(), title: payload.title, isDone: false }
-  return {
-    type: 'tasks/createTask',
-    payload: { todolistId: payload.todolistId, newTask },
-  } as const
-}
+export const createTaskAC = createAction(
+  'tasks/createTask',
+  (payload: { todolistId: Todolist['id']; title: Task['title'] }) => {
+    const { todolistId } = payload
+    const newTask: Task = { id: nanoid(), title: payload.title, isDone: false }
+    return {
+      payload: { todolistId, newTask },
+    }
+  },
+)
 
-export const changeTaskAC = (payload: {
+export const changeTaskAC = createAction<{
   todolistId: Todolist['id']
   taskId: Task['id']
   title?: Task['title']
   isDone?: Task['isDone']
-}) => {
-  return {
-    type: 'tasks/changeTask',
-    payload,
-  } as const
-}
+}>('tasks/changeTask')
 
-export const tasksReducer = (state: TasksState = {}, action: Actions) => {
-  switch (action.type) {
-    case 'todolists/createTodolist': {
-      return { ...state, [action.payload.id]: [] }
-    }
-    case 'todolists/deleteTodolist': {
-      const { [action.payload.todolistId]: _, ...newState } = state
-      return newState
-    }
-    case 'tasks/deleteTask': {
-      if (!state[action.payload.todolistId]) {
-        return state
+export const tasksReducer = createReducer({} as TasksState, (builder) => {
+  builder
+    .addCase(deleteTodolistAC, (state, action) => {
+      delete state[action.payload.todolistId]
+    })
+    .addCase(createTodolistAC, (state, action) => {
+      state[action.payload.id] = []
+    })
+    .addCase(deleteTaskAC, (state, action) => {
+      const { todolistId, taskId } = action.payload
+      const todolist = state[todolistId]
+      if (!todolist) {
+        return
       }
-      return {
-        ...state,
-        [action.payload.todolistId]: state[action.payload.todolistId].filter((t) => t.id !== action.payload.taskId),
+
+      const index = todolist.findIndex((t) => t.id === taskId)
+      if (index !== -1) {
+        state[todolistId].splice(index, 1)
       }
-    }
-    case 'tasks/createTask': {
-      if (!state[action.payload.todolistId]) {
-        return state
+    })
+    .addCase(createTaskAC, (state, action) => {
+      const todolist = state[action.payload.todolistId]
+      if (todolist) {
+        todolist.unshift(action.payload.newTask)
       }
-      return { ...state, [action.payload.todolistId]: [action.payload.newTask, ...state[action.payload.todolistId]] }
-    }
-    case 'tasks/changeTask': {
+    })
+    .addCase(changeTaskAC, (state, action) => {
       const { todolistId, taskId, ...changes } = action.payload
-      if (!state[todolistId]) {
-        return state
+      const todolist = state[todolistId]
+      if (!todolist) {
+        return
       }
-      return { ...state, [todolistId]: state[todolistId].map((t) => (t.id === taskId ? { ...t, ...changes } : t)) }
-    }
-    default: {
-      return state
-    }
-  }
-}
-
-type Actions = CreateTodolistAction | DeleteTodolistAction | DeleteTaskAction | CreateTaskAction | ChangeTaskAction
-
-type DeleteTaskAction = ReturnType<typeof deleteTaskAC>
-type CreateTaskAction = ReturnType<typeof createTaskAC>
-type ChangeTaskAction = ReturnType<typeof changeTaskAC>
+      const task = todolist.find((t) => t.id === taskId)
+      if (task) {
+        Object.assign(task, changes)
+      }
+    })
+})
