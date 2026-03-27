@@ -1,6 +1,8 @@
-import styles from './CreateItemForm.module.css'
-import { Button } from '@/common/components/Button/Button'
 import { type ChangeEvent, type KeyboardEvent, memo, useCallback, useState } from 'react'
+import IconButton from '@mui/material/IconButton'
+import AddBoxIcon from '@mui/icons-material/AddBox'
+import TextField from '@mui/material/TextField'
+import Box from '@mui/material/Box'
 
 type Props = {
   onCreateItem: (title: string) => void
@@ -38,19 +40,32 @@ export const CreateItemForm = memo(({ onCreateItem }: Props) => {
   }, [])
 
   return (
-    <div>
-      <input
-        className={error ? styles.error : ''}
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+        mb: 2,
+        width: '100%',
+        maxWidth: 400,
+      }}
+    >
+      <TextField
+        label={'Enter a title'}
+        variant={'outlined'}
+        size={'small'}
+        error={!!error}
+        helperText={error}
         value={title}
         onChange={changeItemTitleHandler}
         onKeyDown={createItemOnEnterHandler}
       />
-
-      <Button
-        title={'+'}
+      <IconButton
+        color={'primary'}
         onClick={() => createItemHandler(title)}
-      />
-      {error && <div className={styles.errorMessage}>{error}</div>}
-    </div>
+      >
+        <AddBoxIcon />
+      </IconButton>
+    </Box>
   )
 })
