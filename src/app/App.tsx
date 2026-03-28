@@ -1,11 +1,10 @@
 import styles from './App.module.css'
-import { TodolistItem } from '@/features/TodolistItem'
 import { CreateItemForm } from '@/common/components/CreateItemForm/CreateItemForm'
-import { changeTodolistAC, createTodolistAC, deleteTodolistAC } from '@/features/model/todolists-reducer'
-import { changeTaskAC, createTaskAC, deleteTaskAC } from '@/features/model/tasks-reducer'
-import { useAppDispatch, useAppSelector } from '@/common/hooks'
-import { selectTodolists } from '@/features/model/todolists-selectors'
-import { selectTasks } from '@/features/model/tasks-selectors'
+import { createTodolistAC } from '@/features/model/todolists-reducer'
+import { useAppDispatch } from '@/common/hooks'
+import { Todolists } from '@/features/todolists/ui/Todolists/Todolists'
+import Container from '@mui/material/Container'
+import Grid from '@mui/material/Grid'
 
 export type Todolist = {
   id: string
@@ -23,65 +22,24 @@ export type TasksState = Record<Todolist['id'], Task[]>
 
 export type FilterValues = 'all' | 'active' | 'completed'
 
-const getFilteredTasks = (tasks: Task[], filter: FilterValues): Task[] => {
-  switch (filter) {
-    case 'active':
-      return tasks.filter((task) => !task.isDone)
-    case 'completed':
-      return tasks.filter((task) => task.isDone)
-    default:
-      return tasks
-  }
-}
-
 export const App = () => {
-  const todolists = useAppSelector(selectTodolists)
-  const tasks = useAppSelector(selectTasks)
   const dispatch = useAppDispatch()
-
-  const deleteTask = (payload: { todolistId: Todolist['id']; taskId: Task['id'] }) => dispatch(deleteTaskAC(payload))
-
-  const changeFilter = (payload: { todolistId: Todolist['id']; filter: FilterValues }) =>
-    dispatch(changeTodolistAC(payload))
-
-  const createTask = (payload: { todolistId: Todolist['id']; title: Task['title'] }) => dispatch(createTaskAC(payload))
-
-  const changeTaskStatus = (payload: { todolistId: Todolist['id']; taskId: Task['id']; isDone: Task['isDone'] }) =>
-    dispatch(changeTaskAC(payload))
-
-  const deleteTodolist = (todolistId: Todolist['id']) => dispatch(deleteTodolistAC({ todolistId }))
 
   const createTodolistHandler = (title: Todolist['title']) => dispatch(createTodolistAC(title))
 
-  const changeTodolistTitle = (payload: { todolistId: Todolist['id']; title: Todolist['title'] }) =>
-    dispatch(changeTodolistAC(payload))
-
-  const changeTaskTitle = (payload: { todolistId: Todolist['id']; taskId: Task['id']; title: Task['title'] }) =>
-    dispatch(changeTaskAC(payload))
-
   return (
     <div className={styles.app}>
-      <CreateItemForm onCreateItem={createTodolistHandler} />
-      {todolists?.map((todolist) => {
-        const todolistTasks = tasks[todolist.id]
-
-        const filteredTasks = getFilteredTasks(todolistTasks, todolist.filter)
-
-        return (
-          <TodolistItem
-            key={todolist.id}
-            todolist={todolist}
-            tasks={filteredTasks}
-            deleteTask={deleteTask}
-            changeFilter={changeFilter}
-            createTask={createTask}
-            changeTaskStatus={changeTaskStatus}
-            deleteTodolist={deleteTodolist}
-            changeTodolistTitle={changeTodolistTitle}
-            changeTaskTitle={changeTaskTitle}
-          />
-        )
-      })}
+      <Container maxWidth={'lg'}>
+        <Grid sx={{ mb: '30px' }}>
+          <CreateItemForm onCreateItem={createTodolistHandler} />
+        </Grid>
+        <Grid
+          container
+          spacing={4}
+        >
+          <Todolists />
+        </Grid>
+      </Container>
     </div>
   )
 }
