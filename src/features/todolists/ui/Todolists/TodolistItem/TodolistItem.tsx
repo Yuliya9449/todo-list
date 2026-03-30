@@ -7,7 +7,8 @@ import { EditableSpan } from '@/common/components/EditableSpan/EditableSpan'
 import { useAppDispatch, useAppSelector } from '@/common/hooks'
 import { selectTasks } from '@/features/model/tasks-selectors'
 import { changeTaskAC, createTaskAC, deleteTaskAC } from '@/features/model/tasks-reducer'
-import { changeTodolistAC, deleteTodolistAC } from '@/features/model/todolists-reducer'
+import { changeTodolistAC } from '@/features/model/todolists-reducer'
+import { TodolistTitle } from '@/features/todolists/ui/Todolists/TodolistItem/TodolistTitle/TodolistTitle'
 
 const getFilteredTasks = (tasks: Task[], filter: FilterValues): Task[] => {
   switch (filter) {
@@ -42,11 +43,6 @@ export const TodolistItem = memo(({ todolist }: Props) => {
   const changeTaskStatus = (payload: { todolistId: Todolist['id']; taskId: Task['id']; isDone: Task['isDone'] }) =>
     dispatch(changeTaskAC(payload))
 
-  const deleteTodolist = (todolistId: Todolist['id']) => dispatch(deleteTodolistAC({ todolistId }))
-
-  const changeTodolistTitle = (payload: { todolistId: Todolist['id']; title: Todolist['title'] }) =>
-    dispatch(changeTodolistAC(payload))
-
   const changeTaskTitle = (payload: { todolistId: Todolist['id']; taskId: Task['id']; title: Task['title'] }) =>
     dispatch(changeTaskAC(payload))
 
@@ -57,10 +53,6 @@ export const TodolistItem = memo(({ todolist }: Props) => {
     [changeFilter, todolist.id],
   )
 
-  const deleteTodolistHandler = useCallback(() => {
-    deleteTodolist(todolist.id)
-  }, [deleteTodolist, todolist.id])
-
   const createTaskHandler = useCallback(
     (title: Task['title']) => {
       createTask({ todolistId: todolist.id, title })
@@ -68,27 +60,9 @@ export const TodolistItem = memo(({ todolist }: Props) => {
     [createTask, todolist.id],
   )
 
-  const changeTodolistTitleHandler = useCallback(
-    (title: Todolist['title']) => {
-      changeTodolistTitle({ todolistId: todolist.id, title })
-    },
-    [changeTodolistTitle, todolist.id],
-  )
-
   return (
     <div>
-      <div className={styles.container}>
-        <h3>
-          <EditableSpan
-            value={todolist.title}
-            onChangeValue={changeTodolistTitleHandler}
-          />
-        </h3>
-        <Button
-          title={'x'}
-          onClick={deleteTodolistHandler}
-        />
-      </div>
+      <TodolistTitle todolist={todolist} />
       <CreateItemForm onCreateItem={createTaskHandler} />
       {filteredTasks.length === 0 ? (
         <p>Тасок нет</p>
