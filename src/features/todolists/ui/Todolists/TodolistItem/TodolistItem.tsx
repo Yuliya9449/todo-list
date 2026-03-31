@@ -7,8 +7,8 @@ import { EditableSpan } from '@/common/components/EditableSpan/EditableSpan'
 import { useAppDispatch, useAppSelector } from '@/common/hooks'
 import { selectTasks } from '@/features/model/tasks-selectors'
 import { changeTaskAC, createTaskAC, deleteTaskAC } from '@/features/model/tasks-reducer'
-import { changeTodolistAC } from '@/features/model/todolists-reducer'
 import { TodolistTitle } from '@/features/todolists/ui/Todolists/TodolistItem/TodolistTitle/TodolistTitle'
+import { FilterButtons } from '@/features/todolists/ui/Todolists/TodolistItem/FilterButtons/FilterButtons'
 
 const getFilteredTasks = (tasks: Task[], filter: FilterValues): Task[] => {
   switch (filter) {
@@ -35,9 +35,6 @@ export const TodolistItem = memo(({ todolist }: Props) => {
 
   const deleteTask = (payload: { todolistId: Todolist['id']; taskId: Task['id'] }) => dispatch(deleteTaskAC(payload))
 
-  const changeFilter = (payload: { todolistId: Todolist['id']; filter: FilterValues }) =>
-    dispatch(changeTodolistAC(payload))
-
   const createTask = (payload: { todolistId: Todolist['id']; title: Task['title'] }) => dispatch(createTaskAC(payload))
 
   const changeTaskStatus = (payload: { todolistId: Todolist['id']; taskId: Task['id']; isDone: Task['isDone'] }) =>
@@ -45,13 +42,6 @@ export const TodolistItem = memo(({ todolist }: Props) => {
 
   const changeTaskTitle = (payload: { todolistId: Todolist['id']; taskId: Task['id']; title: Task['title'] }) =>
     dispatch(changeTaskAC(payload))
-
-  const changeFilterHandler = useCallback(
-    (filter: FilterValues) => {
-      changeFilter({ todolistId: todolist.id, filter })
-    },
-    [changeFilter, todolist.id],
-  )
 
   const createTaskHandler = useCallback(
     (title: Task['title']) => {
@@ -101,23 +91,7 @@ export const TodolistItem = memo(({ todolist }: Props) => {
           })}
         </ul>
       )}
-      <div>
-        <Button
-          isActive={todolist.filter === 'all'}
-          title={'All'}
-          onClick={() => changeFilterHandler('all')}
-        />
-        <Button
-          isActive={todolist.filter === 'active'}
-          title={'Active'}
-          onClick={() => changeFilterHandler('active')}
-        />
-        <Button
-          isActive={todolist.filter === 'completed'}
-          title={'Completed'}
-          onClick={() => changeFilterHandler('completed')}
-        />
-      </div>
+      <FilterButtons todolist={todolist} />
     </div>
   )
 })
