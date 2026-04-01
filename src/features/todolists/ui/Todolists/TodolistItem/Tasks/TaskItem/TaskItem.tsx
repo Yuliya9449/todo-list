@@ -1,10 +1,12 @@
-import styles from './TaskItem.module.css'
+import ListItem from '@mui/material/ListItem'
+import Checkbox from '@mui/material/Checkbox'
 import { EditableSpan } from '@/common/components/EditableSpan/EditableSpan'
-import { Button } from '@/common/components/Button/Button'
-import type { ChangeEvent } from 'react'
+import { type ChangeEvent, useCallback } from 'react'
 import type { Task, Todolist } from '@/app/App'
 import { changeTaskAC, deleteTaskAC } from '@/features/model/tasks-reducer'
 import { useAppDispatch } from '@/common/hooks'
+import { DeleteButton } from '@/common/components/DeleteButton/DeleteButton'
+import { getListItemSx } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TaskItem/TaskItem.styles'
 
 type Props = {
   todolistId: Todolist['id']
@@ -12,40 +14,41 @@ type Props = {
 }
 
 export const TaskItem = ({ todolistId, task }: Props) => {
+  const { id, title, isDone } = task
   const dispatch = useAppDispatch()
 
-  const deleteTask = (payload: { todolistId: Todolist['id']; taskId: Task['id'] }) => dispatch(deleteTaskAC(payload))
+  const deleteTask = useCallback(() => {
+    dispatch(deleteTaskAC({ todolistId, taskId: id }))
+  }, [dispatch, id, todolistId])
 
-  const changeTaskStatus = (payload: { todolistId: Todolist['id']; taskId: Task['id']; isDone: Task['isDone'] }) =>
-    dispatch(changeTaskAC(payload))
+  const changeTaskStatus = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const newStatusValue = e.currentTarget.checked
+      dispatch(changeTaskAC({ todolistId, taskId: id, isDone: newStatusValue }))
+    },
+    [dispatch, id, todolistId],
+  )
 
-  const changeTaskTitle = (payload: { todolistId: Todolist['id']; taskId: Task['id']; title: Task['title'] }) =>
-    dispatch(changeTaskAC(payload))
-
-  const changeTaskStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
-    const newStatusValue = e.currentTarget.checked
-    changeTaskStatus({ todolistId, taskId: task.id, isDone: newStatusValue })
-  }
-
-  const changeTaskTitleHandler = (title: Task['title']) => {
-    changeTaskTitle({ todolistId, taskId: task.id, title })
-  }
+  const changeTaskTitle = useCallback(
+    (title: Task['title']) => {
+      dispatch(changeTaskAC({ todolistId, taskId: id, title }))
+    },
+    [dispatch, id, todolistId],
+  )
 
   return (
-    <li className={task.isDone ? styles.isDone : ''}>
-      <input
-        type="checkbox"
-        onChange={changeTaskStatusHandler}
-        checked={task.isDone}
-      />
-      <EditableSpan
-        value={task.title}
-        onChangeValue={changeTaskTitleHandler}
-      />
-      <Button
-        title={'X'}
-        onClick={() => deleteTask({ todolistId, taskId: task.id })}
-      />
-    </li>
+    <ListItem sx={getListItemSx(isDone)}>
+      <div>
+        <Checkbox
+          onChange={changeTaskStatus}
+          checked={isDone}
+        />
+        <EditableSpan
+          value={title}
+          onChangeValue={changeTaskTitle}
+        />
+      </div>
+      <DeleteButton onClick={deleteTask} />
+    </ListItem>
   )
 }
