@@ -45,9 +45,6 @@ export const CreateItemForm = memo(({ onCreateItem }: Props) => {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'flex-start',
-        mb: 2,
-        width: '100%',
-        maxWidth: 400,
       }}
     >
       <TextField

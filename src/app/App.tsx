@@ -30,7 +30,10 @@ export const App = () => {
   return (
     <div className={styles.app}>
       <Container maxWidth={'lg'}>
-        <Grid sx={{ mb: '30px' }}>
+        <Grid
+          container
+          sx={{ p: '30px 0' }}
+        >
           <CreateItemForm onCreateItem={createTodolistHandler} />
         </Grid>
         <Grid

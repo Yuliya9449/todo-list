@@ -24,8 +24,7 @@ export const TodolistTitle = ({ todolist }: Props) => {
   return (
     <Grid
       container
-      spacing={1}
-      sx={{ alignItems: 'center', justifyContent: 'space-between' }}
+      sx={{ alignItems: 'center' }}
     >
       <EditableSpan
         value={title}
