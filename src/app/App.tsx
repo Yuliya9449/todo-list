@@ -5,6 +5,7 @@ import { useAppDispatch } from '@/common/hooks'
 import { Todolists } from '@/features/todolists/ui/Todolists/Todolists'
 import Container from '@mui/material/Container'
 import Grid from '@mui/material/Grid'
+import { Header } from '@/common/components/Header/Header'
 
 export type Todolist = {
   id: string
@@ -29,6 +30,7 @@ export const App = () => {
 
   return (
     <div className={styles.app}>
+      <Header />
       <Container maxWidth={'lg'}>
         <Grid
           container
