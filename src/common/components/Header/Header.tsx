@@ -5,12 +5,22 @@ import IconButton from '@mui/material/IconButton'
 import MenuIcon from '@mui/icons-material/Menu'
 import { NavButton } from '@/common/components/NavButton/NavButton'
 import Switch from '@mui/material/Switch'
+import { changeThemeModeAC } from '@/app/model/app-reducer'
+import { useAppDispatch, useAppSelector } from '@/common/hooks'
+import { selectThemeMode } from '@/app/model/app-selectors'
+import { getTheme } from '@/common/theme/theme'
 
-type Props = {
-  changeThemeMode: () => void
-}
+export const Header = () => {
+  const dispatch = useAppDispatch()
 
-export const Header = ({ changeThemeMode }: Props) => {
+  const themeMode = useAppSelector(selectThemeMode)
+
+  const theme = getTheme(themeMode)
+
+  const changeModeHandler = () => {
+    dispatch(changeThemeModeAC({ themeMode: themeMode === 'light' ? 'dark' : 'light' }))
+  }
+
   return (
     <AppBar position="static">
       <Toolbar>
@@ -21,10 +31,10 @@ export const Header = ({ changeThemeMode }: Props) => {
           <div>
             <NavButton>Sign in</NavButton>
             <NavButton>Sign up</NavButton>
-            <NavButton background={'dodgerblue'}>Faq</NavButton>
+            <NavButton background={theme.palette.primary.dark}>Faq</NavButton>
             <Switch
               color={'default'}
-              onChange={changeThemeMode}
+              onChange={changeModeHandler}
             />
           </div>
         </Container>
