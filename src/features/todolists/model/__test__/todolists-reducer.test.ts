@@ -4,7 +4,7 @@ import {
   createTodolistAC,
   deleteTodolistAC,
   todolistsReducer,
-} from '@/features/model/todolists-reducer'
+} from '@/features/todolists/model/todolists-reducer'
 import type { Todolist } from '@/app/App'
 import { nanoid } from '@reduxjs/toolkit'
 

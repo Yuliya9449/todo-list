@@ -2,7 +2,7 @@ import List from '@mui/material/List'
 
 import type { FilterValues, Task, Todolist } from '@/app/App'
 import { useAppSelector } from '@/common/hooks'
-import { selectTasks } from '@/features/model/tasks-selectors'
+import { selectTasks } from '@/features/todolists/model/tasks-selectors'
 import { TaskItem } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TaskItem/TaskItem'
 
 type Props = {

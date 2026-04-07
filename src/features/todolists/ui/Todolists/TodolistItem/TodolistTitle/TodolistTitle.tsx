@@ -1,7 +1,7 @@
 import Grid from '@mui/material/Grid'
 import { EditableSpan } from '@/common/components/EditableSpan/EditableSpan'
 import type { Todolist } from '@/app/App'
-import { changeTodolistAC, deleteTodolistAC } from '@/features/model/todolists-reducer'
+import { changeTodolistAC, deleteTodolistAC } from '@/features/todolists/model/todolists-reducer'
 import { useAppDispatch } from '@/common/hooks'
 import { DeleteButton } from '@/common/components/DeleteButton/DeleteButton'
 

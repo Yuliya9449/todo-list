@@ -1,6 +1,6 @@
 import { TodolistItem } from '@/features/todolists/ui/Todolists/TodolistItem/TodolistItem'
 import { useAppSelector } from '@/common/hooks'
-import { selectTodolists } from '@/features/model/todolists-selectors'
+import { selectTodolists } from '@/features/todolists/model/todolists-selectors'
 import Grid from '@mui/material/Grid'
 import Paper from '@mui/material/Paper'
 
