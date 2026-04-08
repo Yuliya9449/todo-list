@@ -5,9 +5,9 @@ import IconButton from '@mui/material/IconButton'
 import MenuIcon from '@mui/icons-material/Menu'
 import { NavButton } from '@/common/components/NavButton/NavButton'
 import Switch from '@mui/material/Switch'
-import { changeThemeModeAC } from '@/app/model/app-reducer'
+import { changeThemeModeAC } from '@/app/model/app-slice'
 import { useAppDispatch, useAppSelector } from '@/common/hooks'
-import { selectThemeMode } from '@/app/model/app-selectors'
+import { selectThemeMode } from '@/app/model/app-slice'
 import { getTheme } from '@/common/theme/theme'
 
 export const Header = () => {

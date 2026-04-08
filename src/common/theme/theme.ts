@@ -1,5 +1,5 @@
 import { createTheme } from '@mui/material/styles'
-import type { ThemeMode } from '@/app/model/app-reducer'
+import type { ThemeMode } from '@/app/model/app-slice'
 
 export const getTheme = (themeMode: ThemeMode) => {
   return createTheme({
