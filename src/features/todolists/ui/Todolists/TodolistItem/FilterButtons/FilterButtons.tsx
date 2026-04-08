@@ -1,7 +1,7 @@
 import Grid from '@mui/material/Grid'
 import Button from '@mui/material/Button'
 import type { FilterValues, Todolist } from '@/app/App'
-import { changeTodolistAC } from '@/features/todolists/model/todolists-reducer'
+import { changeTodolistAC } from '@/features/todolists/model/todolists-slice'
 import { useAppDispatch } from '@/common/hooks'
 
 type Props = {

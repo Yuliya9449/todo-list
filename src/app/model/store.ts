@@ -1,11 +1,11 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit'
 import { tasksReducer } from '@/features/todolists/model/tasks-reducer'
-import { todolistsReducer } from '@/features/todolists/model/todolists-slice'
+import { todolistsReducer, todolistsSlice } from '@/features/todolists/model/todolists-slice'
 import { appReducer, appSlice } from '@/app/model/app-slice'
 
 const rootReducer = combineReducers({
   tasks: tasksReducer,
-  todolists: todolistsReducer,
+  [todolistsSlice.name]: todolistsReducer,
   [appSlice.name]: appReducer,
 })
 
