@@ -1,6 +1,7 @@
-import type { Task, TasksState, Todolist } from '@/app/App'
+import type { Task, TasksState } from '@/app/App'
 import { createTodolistAC, deleteTodolistAC } from '@/features/todolists/model/todolists-slice'
 import { createSlice, nanoid } from '@reduxjs/toolkit'
+import type { DomainTodolist } from '@/features/todolists/api/todolistsApi.types'
 
 export const tasksSlice = createSlice({
   name: 'tasksReducer',
@@ -18,7 +19,7 @@ export const tasksSlice = createSlice({
       })
   },
   reducers: (create) => ({
-    deleteTaskAC: create.reducer<{ todolistId: Todolist['id']; taskId: Task['id'] }>((state, action) => {
+    deleteTaskAC: create.reducer<{ todolistId: DomainTodolist['id']; taskId: Task['id'] }>((state, action) => {
       const { todolistId, taskId } = action.payload
       const todolist = state[todolistId]
       if (!todolist) {
@@ -31,7 +32,7 @@ export const tasksSlice = createSlice({
       }
     }),
     createTaskAC: create.preparedReducer(
-      (args: { todolistId: Todolist['id']; title: Task['title'] }) => {
+      (args: { todolistId: DomainTodolist['id']; title: Task['title'] }) => {
         const newTask: Task = { id: nanoid(), title: args.title, isDone: false }
         return {
           payload: { todolistId: args.todolistId, newTask },
@@ -45,7 +46,7 @@ export const tasksSlice = createSlice({
       },
     ),
     changeTaskAC: create.reducer<{
-      todolistId: Todolist['id']
+      todolistId: DomainTodolist['id']
       taskId: Task['id']
       title?: Task['title']
       isDone?: Task['isDone']

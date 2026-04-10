@@ -1,12 +1,12 @@
 import Grid from '@mui/material/Grid'
 import { EditableSpan } from '@/common/components/EditableSpan/EditableSpan'
-import type { Todolist } from '@/app/App'
 import { changeTodolistAC, deleteTodolistAC } from '@/features/todolists/model/todolists-slice'
 import { useAppDispatch } from '@/common/hooks'
 import { DeleteButton } from '@/common/components/DeleteButton/DeleteButton'
+import type { DomainTodolist } from '@/features/todolists/api/todolistsApi.types'
 
 type Props = {
-  todolist: Todolist
+  todolist: DomainTodolist
 }
 
 export const TodolistTitle = ({ todolist }: Props) => {
@@ -17,7 +17,7 @@ export const TodolistTitle = ({ todolist }: Props) => {
     dispatch(deleteTodolistAC({ todolistId: id }))
   }
 
-  const changeTodolistTitle = (title: Todolist['title']) => {
+  const changeTodolistTitle = (title: DomainTodolist['title']) => {
     dispatch(changeTodolistAC({ todolistId: id, title }))
   }
 

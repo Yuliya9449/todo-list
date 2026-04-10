@@ -3,13 +3,13 @@ import { CreateItemForm } from '@/common/components/CreateItemForm/CreateItemFor
 import { Todolists } from '@/features/todolists/ui/Todolists/Todolists'
 import Container from '@mui/material/Container'
 import { createTodolistAC } from '@/features/todolists/model/todolists-slice'
-import type { Todolist } from '@/app/App'
 import { useAppDispatch } from '@/common/hooks'
+import type { DomainTodolist } from '@/features/todolists/api/todolistsApi.types'
 
 export const Main = () => {
   const dispatch = useAppDispatch()
 
-  const createTodolistHandler = (title: Todolist['title']) => dispatch(createTodolistAC(title))
+  const createTodolistHandler = (title: DomainTodolist['title']) => dispatch(createTodolistAC(title))
 
   return (
     <Container maxWidth={'lg'}>

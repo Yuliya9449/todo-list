@@ -2,14 +2,15 @@ import ListItem from '@mui/material/ListItem'
 import Checkbox from '@mui/material/Checkbox'
 import { EditableSpan } from '@/common/components/EditableSpan/EditableSpan'
 import { type ChangeEvent, useCallback } from 'react'
-import type { Task, Todolist } from '@/app/App'
+import type { Task } from '@/app/App'
 import { changeTaskAC, deleteTaskAC } from '@/features/todolists/model/tasks-slice'
 import { useAppDispatch } from '@/common/hooks'
 import { DeleteButton } from '@/common/components/DeleteButton/DeleteButton'
 import { getListItemSx } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TaskItem/TaskItem.styles'
+import type { DomainTodolist } from '@/features/todolists/api/todolistsApi.types'
 
 type Props = {
-  todolistId: Todolist['id']
+  todolistId: DomainTodolist['id']
   task: Task
 }
 

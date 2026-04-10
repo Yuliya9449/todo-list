@@ -1,4 +1,4 @@
-import type { Task, Todolist } from '@/app/App'
+import type { Task } from '@/app/App'
 import { memo } from 'react'
 import { CreateItemForm } from '@/common/components/CreateItemForm/CreateItemForm'
 import { useAppDispatch } from '@/common/hooks'
@@ -6,9 +6,10 @@ import { createTaskAC } from '@/features/todolists/model/tasks-slice'
 import { TodolistTitle } from '@/features/todolists/ui/Todolists/TodolistItem/TodolistTitle/TodolistTitle'
 import { FilterButtons } from '@/features/todolists/ui/Todolists/TodolistItem/FilterButtons/FilterButtons'
 import { Tasks } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/Tasks'
+import type { DomainTodolist } from '@/features/todolists/api/todolistsApi.types'
 
 type Props = {
-  todolist: Todolist
+  todolist: DomainTodolist
 }
 
 export const TodolistItem = memo(({ todolist }: Props) => {
