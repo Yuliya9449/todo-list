@@ -7,7 +7,7 @@ import { changeTaskAC, deleteTaskAC } from '@/features/todolists/model/tasks-sli
 import { useAppDispatch } from '@/common/hooks'
 import { DeleteButton } from '@/common/components/DeleteButton/DeleteButton'
 import { getListItemSx } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TaskItem/TaskItem.styles'
-import type { DomainTodolist } from '@/features/todolists/api/todolistsApi.types'
+import type { DomainTodolist } from '@/features/todolists/model/todolists-slice'
 
 type Props = {
   todolistId: DomainTodolist['id']

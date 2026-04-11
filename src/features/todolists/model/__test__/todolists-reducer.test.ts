@@ -5,8 +5,14 @@ import {
   deleteTodolistAC,
   todolistsReducer,
 } from '@/features/todolists/model/todolists-slice'
-import type { Todolist } from '@/app/App'
 import { nanoid } from '@reduxjs/toolkit'
+import type { FilterValues } from '@/app/App'
+
+type Todolist = {
+  id: string
+  title: string
+  filter: FilterValues
+}
 
 let startState: Todolist[]
 

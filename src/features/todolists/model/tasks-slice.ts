@@ -1,7 +1,7 @@
 import type { Task, TasksState } from '@/app/App'
 import { createTodolistAC, deleteTodolistAC } from '@/features/todolists/model/todolists-slice'
 import { createSlice, nanoid } from '@reduxjs/toolkit'
-import type { DomainTodolist } from '@/features/todolists/api/todolistsApi.types'
+import type { DomainTodolist } from '@/features/todolists/model/todolists-slice'
 
 export const tasksSlice = createSlice({
   name: 'tasksReducer',

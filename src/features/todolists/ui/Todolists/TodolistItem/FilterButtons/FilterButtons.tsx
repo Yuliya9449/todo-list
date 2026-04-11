@@ -3,7 +3,7 @@ import Button from '@mui/material/Button'
 import type { FilterValues } from '@/app/App'
 import { changeTodolistAC } from '@/features/todolists/model/todolists-slice'
 import { useAppDispatch } from '@/common/hooks'
-import type { DomainTodolist } from '@/features/todolists/api/todolistsApi.types'
+import type { DomainTodolist } from '@/features/todolists/model/todolists-slice'
 
 type Props = {
   todolist: DomainTodolist

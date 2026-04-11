@@ -2,14 +2,14 @@ import Grid from '@mui/material/Grid'
 import { CreateItemForm } from '@/common/components/CreateItemForm/CreateItemForm'
 import { Todolists } from '@/features/todolists/ui/Todolists/Todolists'
 import Container from '@mui/material/Container'
-import { createTodolistAC } from '@/features/todolists/model/todolists-slice'
+import { createTodolistTC } from '@/features/todolists/model/todolists-slice'
 import { useAppDispatch } from '@/common/hooks'
-import type { DomainTodolist } from '@/features/todolists/api/todolistsApi.types'
+import type { DomainTodolist } from '@/features/todolists/model/todolists-slice'
 
 export const Main = () => {
   const dispatch = useAppDispatch()
 
-  const createTodolistHandler = (title: DomainTodolist['title']) => dispatch(createTodolistAC(title))
+  const createTodolistHandler = (title: DomainTodolist['title']) => dispatch(createTodolistTC(title))
 
   return (
     <Container maxWidth={'lg'}>

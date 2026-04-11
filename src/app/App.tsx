@@ -6,12 +6,7 @@ import CssBaseline from '@mui/material/CssBaseline'
 import { selectThemeMode } from '@/app/model/app-slice'
 import { getTheme } from '@/common/theme/theme'
 import { Main } from '@/app/Main'
-
-export type Todolist = {
-  id: string
-  title: string
-  filter: FilterValues
-}
+import type { DomainTodolist } from '@/features/todolists/model/todolists-slice'
 
 export type Task = {
   id: string
@@ -19,7 +14,7 @@ export type Task = {
   isDone: boolean
 }
 
-export type TasksState = Record<Todolist['id'], Task[]>
+export type TasksState = Record<DomainTodolist['id'], Task[]>
 
 export type FilterValues = 'all' | 'active' | 'completed'
 

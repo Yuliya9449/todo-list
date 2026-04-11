@@ -4,7 +4,7 @@ import type { FilterValues, Task } from '@/app/App'
 import { useAppSelector } from '@/common/hooks'
 import { TaskItem } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TaskItem/TaskItem'
 import { selectTasks } from '@/features/todolists/model/tasks-slice'
-import type { DomainTodolist } from '@/features/todolists/api/todolistsApi.types'
+import type { DomainTodolist } from '@/features/todolists/model/todolists-slice'
 
 type Props = {
   todolist: DomainTodolist

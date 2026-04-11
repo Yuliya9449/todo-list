@@ -6,7 +6,7 @@ import { createTaskAC } from '@/features/todolists/model/tasks-slice'
 import { TodolistTitle } from '@/features/todolists/ui/Todolists/TodolistItem/TodolistTitle/TodolistTitle'
 import { FilterButtons } from '@/features/todolists/ui/Todolists/TodolistItem/FilterButtons/FilterButtons'
 import { Tasks } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/Tasks'
-import type { DomainTodolist } from '@/features/todolists/api/todolistsApi.types'
+import type { DomainTodolist } from '@/features/todolists/model/todolists-slice'
 
 type Props = {
   todolist: DomainTodolist
