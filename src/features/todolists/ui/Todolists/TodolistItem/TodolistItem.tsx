@@ -1,12 +1,12 @@
-import type { Task } from '@/app/App'
 import { memo } from 'react'
 import { CreateItemForm } from '@/common/components/CreateItemForm/CreateItemForm'
 import { useAppDispatch } from '@/common/hooks'
-import { createTaskAC } from '@/features/todolists/model/tasks-slice'
+import { createTaskTC } from '@/features/todolists/model/tasks-slice'
 import { TodolistTitle } from '@/features/todolists/ui/Todolists/TodolistItem/TodolistTitle/TodolistTitle'
 import { FilterButtons } from '@/features/todolists/ui/Todolists/TodolistItem/FilterButtons/FilterButtons'
 import { Tasks } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/Tasks'
 import type { DomainTodolist } from '@/features/todolists/model/todolists-slice'
+import type { DomainTask } from '@/features/todolists/api/tasksApi.types'
 
 type Props = {
   todolist: DomainTodolist
@@ -15,8 +15,8 @@ type Props = {
 export const TodolistItem = memo(({ todolist }: Props) => {
   const dispatch = useAppDispatch()
 
-  const createTask = (title: Task['title']) => {
-    dispatch(createTaskAC({ todolistId: todolist.id, title }))
+  const createTask = (title: DomainTask['title']) => {
+    dispatch(createTaskTC({ todolistId: todolist.id, title }))
   }
 
   return (

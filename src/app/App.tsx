@@ -7,6 +7,7 @@ import { selectThemeMode } from '@/app/model/app-slice'
 import { getTheme } from '@/common/theme/theme'
 import { Main } from '@/app/Main'
 import type { DomainTodolist } from '@/features/todolists/model/todolists-slice'
+import type { DomainTask } from '@/features/todolists/api/tasksApi.types'
 
 export type Task = {
   id: string
@@ -14,7 +15,7 @@ export type Task = {
   isDone: boolean
 }
 
-export type TasksState = Record<DomainTodolist['id'], Task[]>
+export type TasksState = Record<DomainTodolist['id'], DomainTask[]>
 
 export type FilterValues = 'all' | 'active' | 'completed'
 

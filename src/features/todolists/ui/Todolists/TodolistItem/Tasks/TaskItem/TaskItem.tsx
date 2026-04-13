@@ -2,47 +2,52 @@ import ListItem from '@mui/material/ListItem'
 import Checkbox from '@mui/material/Checkbox'
 import { EditableSpan } from '@/common/components/EditableSpan/EditableSpan'
 import { type ChangeEvent, useCallback } from 'react'
-import type { Task } from '@/app/App'
-import { changeTaskAC, deleteTaskAC } from '@/features/todolists/model/tasks-slice'
+import { changeTaskTC, deleteTaskTC } from '@/features/todolists/model/tasks-slice'
 import { useAppDispatch } from '@/common/hooks'
 import { DeleteButton } from '@/common/components/DeleteButton/DeleteButton'
 import { getListItemSx } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TaskItem/TaskItem.styles'
 import type { DomainTodolist } from '@/features/todolists/model/todolists-slice'
+import type { DomainTask } from '@/features/todolists/api/tasksApi.types'
+import { TaskStatus } from '@/common/enums'
 
 type Props = {
   todolistId: DomainTodolist['id']
-  task: Task
+  task: DomainTask
 }
 
 export const TaskItem = ({ todolistId, task }: Props) => {
-  const { id, title, isDone } = task
+  const { id, title } = task
   const dispatch = useAppDispatch()
 
   const deleteTask = useCallback(() => {
-    dispatch(deleteTaskAC({ todolistId, taskId: id }))
+    dispatch(deleteTaskTC({ todolistId, taskId: id }))
   }, [dispatch, id, todolistId])
 
   const changeTaskStatus = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      const newStatusValue = e.currentTarget.checked
-      dispatch(changeTaskAC({ todolistId, taskId: id, isDone: newStatusValue }))
+      const newStatusValue: TaskStatus = e.currentTarget.checked ? TaskStatus.Completed : TaskStatus.New
+      const updatedTask: DomainTask = { ...task, status: newStatusValue }
+      dispatch(changeTaskTC(updatedTask))
     },
-    [dispatch, id, todolistId],
+    [dispatch, task],
   )
 
   const changeTaskTitle = useCallback(
-    (title: Task['title']) => {
-      dispatch(changeTaskAC({ todolistId, taskId: id, title }))
+    (title: DomainTask['title']) => {
+      const updatedTask: DomainTask = { ...task, title }
+      dispatch(changeTaskTC(updatedTask))
     },
-    [dispatch, id, todolistId],
+    [dispatch, task],
   )
 
+  const isTaskCompleted = task.status === TaskStatus.Completed
+
   return (
-    <ListItem sx={getListItemSx(isDone)}>
+    <ListItem sx={getListItemSx(isTaskCompleted)}>
       <div>
         <Checkbox
           onChange={changeTaskStatus}
-          checked={isDone}
+          checked={isTaskCompleted}
         />
         <EditableSpan
           value={title}
