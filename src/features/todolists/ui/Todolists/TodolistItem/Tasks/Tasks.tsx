@@ -1,10 +1,8 @@
 import List from '@mui/material/List'
-
-import type { FilterValues } from '@/app/App'
 import { useAppDispatch, useAppSelector } from '@/common/hooks'
 import { TaskItem } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TaskItem/TaskItem'
 import { fetchTodolistsTC, selectTasks } from '@/features/todolists/model/tasks-slice'
-import type { DomainTodolist } from '@/features/todolists/model/todolists-slice'
+import type { DomainTodolist, FilterValues } from '@/features/todolists/model/todolists-slice'
 import { useEffect } from 'react'
 import type { DomainTask } from '@/features/todolists/api/tasksApi.types'
 import { TaskStatus } from '@/common/enums'

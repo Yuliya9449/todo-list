@@ -1,4 +1,3 @@
-import type { TasksState } from '@/app/App'
 import type { DomainTodolist } from '@/features/todolists/model/todolists-slice'
 import { createTodolistTC, deleteTodolistTC } from '@/features/todolists/model/todolists-slice'
 import { tasksApi } from '@/features/todolists/api/tasksApi'
@@ -134,3 +133,5 @@ export const tasksSlice = createAppSlice({
 export const { fetchTodolistsTC, createTaskTC, deleteTaskTC, changeTaskTC } = tasksSlice.actions
 export const { selectTasks } = tasksSlice.selectors
 export const tasksReducer = tasksSlice.reducer
+
+export type TasksState = Record<DomainTodolist['id'], DomainTask[]>

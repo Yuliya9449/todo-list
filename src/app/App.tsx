@@ -17,8 +17,6 @@ export type Task = {
 
 export type TasksState = Record<DomainTodolist['id'], DomainTask[]>
 
-export type FilterValues = 'all' | 'active' | 'completed'
-
 export const App = () => {
   const themeMode = useAppSelector(selectThemeMode)
   const theme = getTheme(themeMode)

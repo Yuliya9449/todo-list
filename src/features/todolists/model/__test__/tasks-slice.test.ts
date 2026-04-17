@@ -1,6 +1,11 @@
 import { beforeEach, expect, test } from 'vitest'
-import type { TasksState } from '@/app/App'
-import { changeTaskTC, createTaskTC, deleteTaskTC, tasksReducer } from '@/features/todolists/model/tasks-slice'
+import {
+  changeTaskTC,
+  createTaskTC,
+  deleteTaskTC,
+  tasksReducer,
+  type TasksState,
+} from '@/features/todolists/model/tasks-slice'
 import { createTodolistTC, deleteTodolistTC } from '@/features/todolists/model/todolists-slice'
 import { TaskPriority, TaskStatus } from '@/common/enums'
 import type { DomainTask } from '@/features/todolists/api/tasksApi.types'

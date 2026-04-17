@@ -1,4 +1,3 @@
-import type { FilterValues } from '@/app/App'
 import type { Todolist } from '@/features/todolists/api/todolistsApi.types'
 import { createAppSlice } from '@/common/utils'
 import { todolistsApi } from '@/features/todolists/api/todolistsApi'
@@ -115,3 +114,5 @@ export const todolistsReducer = todolistsSlice.reducer
 export type DomainTodolist = Todolist & {
   filter: FilterValues
 }
+
+export type FilterValues = 'all' | 'active' | 'completed'

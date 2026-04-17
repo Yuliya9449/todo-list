@@ -1,7 +1,6 @@
 import Grid from '@mui/material/Grid'
 import Button from '@mui/material/Button'
-import type { FilterValues } from '@/app/App'
-import { changeTodolistFilterAC } from '@/features/todolists/model/todolists-slice'
+import { changeTodolistFilterAC, type FilterValues } from '@/features/todolists/model/todolists-slice'
 import { useAppDispatch } from '@/common/hooks'
 import type { DomainTodolist } from '@/features/todolists/model/todolists-slice'
 
