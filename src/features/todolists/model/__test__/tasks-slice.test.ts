@@ -15,7 +15,7 @@ const taskDefaultValues = {
   order: 0,
 }
 
-let startState: TasksState
+let startState: TasksState = {}
 
 beforeEach(() => {
   startState = {

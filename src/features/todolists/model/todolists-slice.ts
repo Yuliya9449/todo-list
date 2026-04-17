@@ -2,6 +2,7 @@ import type { FilterValues } from '@/app/App'
 import type { Todolist } from '@/features/todolists/api/todolistsApi.types'
 import { createAppSlice } from '@/common/utils'
 import { todolistsApi } from '@/features/todolists/api/todolistsApi'
+import { setRequestStatusAC } from '@/app/model/app-slice'
 
 export const todolistsSlice = createAppSlice({
   name: 'todolists',
@@ -10,12 +11,16 @@ export const todolistsSlice = createAppSlice({
     selectTodolists: (sliceState): DomainTodolist[] => sliceState,
   },
   reducers: (create) => ({
+    // thunks
     fetchTodolistsTC: create.asyncThunk(
-      async (_, { rejectWithValue }) => {
+      async (_, { dispatch, rejectWithValue }) => {
         try {
+          dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
           const res = await todolistsApi.getTodolists()
+          dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
           return res.data
         } catch {
+          dispatch(setRequestStatusAC({ requestStatus: 'failed' }))
           return rejectWithValue(null)
         }
       },
@@ -26,11 +31,14 @@ export const todolistsSlice = createAppSlice({
       },
     ),
     createTodolistTC: create.asyncThunk(
-      async (title: DomainTodolist['title'], { rejectWithValue }) => {
+      async (title: DomainTodolist['title'], { dispatch, rejectWithValue }) => {
         try {
+          dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
           const res = await todolistsApi.createTodolist(title)
+          dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
           return { todolist: res.data.data.item }
         } catch {
+          dispatch(setRequestStatusAC({ requestStatus: 'failed' }))
           return rejectWithValue(null)
         }
       },
@@ -41,11 +49,14 @@ export const todolistsSlice = createAppSlice({
       },
     ),
     deleteTodolistTC: create.asyncThunk(
-      async (arg: { id: DomainTodolist['id'] }, { rejectWithValue }) => {
+      async (arg: { id: DomainTodolist['id'] }, { dispatch, rejectWithValue }) => {
         try {
+          dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
           await todolistsApi.deleteTodolist(arg.id)
+          dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
           return arg
         } catch {
+          dispatch(setRequestStatusAC({ requestStatus: 'failed' }))
           return rejectWithValue(null)
         }
       },
@@ -59,11 +70,14 @@ export const todolistsSlice = createAppSlice({
       },
     ),
     changeTodolistTitleTC: create.asyncThunk(
-      async (arg: { id: DomainTodolist['id']; title: DomainTodolist['title'] }, { rejectWithValue }) => {
+      async (arg: { id: DomainTodolist['id']; title: DomainTodolist['title'] }, { dispatch, rejectWithValue }) => {
         try {
+          dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
           await todolistsApi.changeTodolistTitle(arg)
+          dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
           return arg
         } catch {
+          dispatch(setRequestStatusAC({ requestStatus: 'failed' }))
           return rejectWithValue(null)
         }
       },
@@ -78,8 +92,7 @@ export const todolistsSlice = createAppSlice({
       },
     ),
 
-    // TODO: этот для changeTodolistFilter, нужно будет переименовать
-
+    // actions
     changeTodolistFilterAC: create.reducer<{
       todolistId: DomainTodolist['id']
       title?: DomainTodolist['title']

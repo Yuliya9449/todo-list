@@ -4,6 +4,7 @@ import { createTodolistTC, deleteTodolistTC } from '@/features/todolists/model/t
 import { tasksApi } from '@/features/todolists/api/tasksApi'
 import type { DomainTask } from '@/features/todolists/api/tasksApi.types'
 import { createAppSlice } from '@/common/utils'
+import { setRequestStatusAC } from '@/app/model/app-slice'
 
 export const tasksSlice = createAppSlice({
   name: 'tasksReducer',
@@ -22,11 +23,14 @@ export const tasksSlice = createAppSlice({
   },
   reducers: (create) => ({
     fetchTodolistsTC: create.asyncThunk(
-      async (todolistId: DomainTodolist['id'], { rejectWithValue }) => {
+      async (todolistId: DomainTodolist['id'], { dispatch, rejectWithValue }) => {
         try {
+          dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
           const res = await tasksApi.getTasks(todolistId)
+          dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
           return { todolistId, tasks: res.data.items }
         } catch {
+          dispatch(setRequestStatusAC({ requestStatus: 'failed' }))
           return rejectWithValue(null)
         }
       },
@@ -43,12 +47,15 @@ export const tasksSlice = createAppSlice({
           todolistId: DomainTodolist['id']
           title: DomainTask['title']
         },
-        { rejectWithValue },
+        { dispatch, rejectWithValue },
       ) => {
         try {
+          dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
           const res = await tasksApi.createTask(arg)
+          dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
           return res.data.data.item
         } catch {
+          dispatch(setRequestStatusAC({ requestStatus: 'failed' }))
           return rejectWithValue(null)
         }
       },
@@ -68,12 +75,15 @@ export const tasksSlice = createAppSlice({
           todolistId: DomainTodolist['id']
           taskId: DomainTask['id']
         },
-        { rejectWithValue },
+        { dispatch, rejectWithValue },
       ) => {
         try {
+          dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
           await tasksApi.deleteTask(arg)
+          dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
           return arg
         } catch {
+          dispatch(setRequestStatusAC({ requestStatus: 'failed' }))
           return rejectWithValue(null)
         }
       },
@@ -93,11 +103,14 @@ export const tasksSlice = createAppSlice({
       },
     ),
     changeTaskTC: create.asyncThunk(
-      async (updatedTask: DomainTask, { rejectWithValue }) => {
+      async (updatedTask: DomainTask, { dispatch, rejectWithValue }) => {
         try {
+          dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
           const res = await tasksApi.updateTask(updatedTask)
+          dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
           return res.data.data.item
         } catch {
+          dispatch(setRequestStatusAC({ requestStatus: 'failed' }))
           return rejectWithValue(null)
         }
       },
