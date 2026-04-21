@@ -11,17 +11,16 @@ import type { DomainTask } from '@/features/todolists/api/tasksApi.types'
 import { TaskStatus } from '@/common/enums'
 
 type Props = {
-  todolistId: DomainTodolist['id']
+  todolist: DomainTodolist
   task: DomainTask
 }
 
-export const TaskItem = ({ todolistId, task }: Props) => {
-  const { id, title } = task
+export const TaskItem = ({ todolist, task }: Props) => {
   const dispatch = useAppDispatch()
 
   const deleteTask = useCallback(() => {
-    dispatch(deleteTaskTC({ todolistId, taskId: id }))
-  }, [dispatch, id, todolistId])
+    dispatch(deleteTaskTC({ todolistId: todolist.id, taskId: task.id }))
+  }, [dispatch, task.id, todolist.id])
 
   const changeTaskStatus = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -48,13 +47,18 @@ export const TaskItem = ({ todolistId, task }: Props) => {
         <Checkbox
           onChange={changeTaskStatus}
           checked={isTaskCompleted}
+          disabled={todolist.isDisabled}
         />
         <EditableSpan
-          value={title}
+          value={task.title}
           onChangeValue={changeTaskTitle}
+          disabled={todolist.isDisabled}
         />
       </div>
-      <DeleteButton onClick={deleteTask} />
+      <DeleteButton
+        onClick={deleteTask}
+        disabled={todolist.isDisabled}
+      />
     </ListItem>
   )
 }

@@ -22,7 +22,10 @@ export const TodolistItem = memo(({ todolist }: Props) => {
   return (
     <div>
       <TodolistTitle todolist={todolist} />
-      <CreateItemForm onCreateItem={createTask} />
+      <CreateItemForm
+        onCreateItem={createTask}
+        disabled={todolist.isDisabled}
+      />
       <Tasks todolist={todolist} />
       <FilterButtons todolist={todolist} />
     </div>

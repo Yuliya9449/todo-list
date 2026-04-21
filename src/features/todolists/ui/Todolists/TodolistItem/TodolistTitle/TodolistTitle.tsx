@@ -10,7 +10,7 @@ type Props = {
 }
 
 export const TodolistTitle = ({ todolist }: Props) => {
-  const { id, title } = todolist
+  const { id, title, isDisabled } = todolist
   const dispatch = useAppDispatch()
 
   const deleteTodolist = () => {
@@ -27,10 +27,14 @@ export const TodolistTitle = ({ todolist }: Props) => {
       sx={{ alignItems: 'center' }}
     >
       <EditableSpan
+        disabled={isDisabled}
         value={title}
         onChangeValue={changeTodolistTitle}
       />
-      <DeleteButton onClick={deleteTodolist} />
+      <DeleteButton
+        disabled={isDisabled}
+        onClick={deleteTodolist}
+      />
     </Grid>
   )
 }

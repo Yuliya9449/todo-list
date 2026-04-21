@@ -1,14 +1,15 @@
-import { type ChangeEvent, type KeyboardEvent, memo, useCallback, useState } from 'react'
+import { type ChangeEvent, type ComponentProps, type KeyboardEvent, memo, useCallback, useState } from 'react'
 import IconButton from '@mui/material/IconButton'
 import AddBoxIcon from '@mui/icons-material/AddBox'
 import TextField from '@mui/material/TextField'
 import Box from '@mui/material/Box'
 
-type Props = {
+type Props = ComponentProps<typeof Box> & {
   onCreateItem: (title: string) => void
+  disabled?: boolean
 }
 
-export const CreateItemForm = memo(({ onCreateItem }: Props) => {
+export const CreateItemForm = memo(({ onCreateItem, disabled, ...rest }: Props) => {
   const [title, setTitle] = useState('')
   const [error, setError] = useState<string | null>(null)
 
@@ -46,6 +47,7 @@ export const CreateItemForm = memo(({ onCreateItem }: Props) => {
         flexDirection: 'row',
         alignItems: 'flex-start',
       }}
+      {...rest}
     >
       <TextField
         label={'Enter a title'}
@@ -56,10 +58,12 @@ export const CreateItemForm = memo(({ onCreateItem }: Props) => {
         value={title}
         onChange={changeItemTitleHandler}
         onKeyDown={createItemOnEnterHandler}
+        disabled={disabled}
       />
       <IconButton
         color={'primary'}
         onClick={() => createItemHandler(title)}
+        disabled={disabled}
       >
         <AddBoxIcon />
       </IconButton>

@@ -4,13 +4,15 @@ import TextField from '@mui/material/TextField'
 type Props = {
   value: string
   onChangeValue: (title: string) => void
+  disabled?: boolean
 }
 
-export const EditableSpan = ({ value, onChangeValue }: Props) => {
+export const EditableSpan = ({ value, onChangeValue, disabled }: Props) => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [title, setTitle] = useState('')
 
   const activateEditMode = () => {
+    if (disabled) return
     setIsEditMode(true)
     setTitle(value)
   }
@@ -51,7 +53,7 @@ export const EditableSpan = ({ value, onChangeValue }: Props) => {
         />
       ) : (
         <span
-          style={{ cursor: 'pointer' }}
+          style={{ cursor: 'pointer', opacity: disabled ? '0.5' : '1' }}
           onDoubleClick={activateEditMode}
         >
           {value}

@@ -43,7 +43,7 @@ export const Tasks = ({ todolist }: Props) => {
             return (
               <TaskItem
                 key={task.id}
-                todolistId={todolist.id}
+                todolist={todolist}
                 task={task}
               />
             )

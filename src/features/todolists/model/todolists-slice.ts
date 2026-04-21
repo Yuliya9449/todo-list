@@ -25,7 +25,7 @@ export const todolistsSlice = createAppSlice({
       },
       {
         fulfilled: (_, action) => {
-          return action.payload.map((t) => ({ ...t, filter: 'all' }))
+          return action.payload.map((t) => ({ ...t, filter: 'all', isDisabled: false }))
         },
       },
     ),
@@ -43,19 +43,21 @@ export const todolistsSlice = createAppSlice({
       },
       {
         fulfilled: (state, action) => {
-          state.unshift({ ...action.payload.todolist, filter: 'all' })
+          state.unshift({ ...action.payload.todolist, filter: 'all', isDisabled: false })
         },
       },
     ),
     deleteTodolistTC: create.asyncThunk(
       async (arg: { id: DomainTodolist['id'] }, { dispatch, rejectWithValue }) => {
         try {
+          dispatch(setTodolistIsDisabledAC({ id: arg.id, isDisabled: true }))
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
           await todolistsApi.deleteTodolist(arg.id)
           dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
           return arg
         } catch {
           dispatch(setRequestStatusAC({ requestStatus: 'failed' }))
+          dispatch(setTodolistIsDisabledAC({ id: arg.id, isDisabled: false }))
           return rejectWithValue(null)
         }
       },
@@ -103,16 +105,30 @@ export const todolistsSlice = createAppSlice({
         Object.assign(todolist, changes)
       }
     }),
+    setTodolistIsDisabledAC: create.reducer<{ id: string; isDisabled: boolean }>((state, action) => {
+      const { id, isDisabled } = action.payload
+      const todolist = state.find((t) => t.id === id)
+      if (todolist) {
+        todolist.isDisabled = isDisabled
+      }
+    }),
   }),
 })
 
-export const { changeTodolistFilterAC, fetchTodolistsTC, createTodolistTC, deleteTodolistTC, changeTodolistTitleTC } =
-  todolistsSlice.actions
+export const {
+  fetchTodolistsTC,
+  createTodolistTC,
+  deleteTodolistTC,
+  changeTodolistTitleTC,
+  changeTodolistFilterAC,
+  setTodolistIsDisabledAC,
+} = todolistsSlice.actions
 export const { selectTodolists } = todolistsSlice.selectors
 export const todolistsReducer = todolistsSlice.reducer
 
 export type DomainTodolist = Todolist & {
   filter: FilterValues
+  isDisabled: boolean
 }
 
 export type FilterValues = 'all' | 'active' | 'completed'
