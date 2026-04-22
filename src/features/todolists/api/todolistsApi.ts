@@ -10,9 +10,8 @@ export const todolistsApi = {
   createTodolist(title: Todolist['title']) {
     return instance.post<BaseResponse<{ item: Todolist }>>('/todo-lists', { title })
   },
-  deleteTodolist(id: DomainTodolist['title']) {
+  deleteTodolist(id: DomainTodolist['id']) {
     return instance.delete<BaseResponse>(`/todo-lists/${id}`)
-    // return instance.delete<BaseResponse>(`/todo-lists/${todolistId}`)
   },
   changeTodolistTitle(payload: { id: DomainTodolist['id']; title: DomainTodolist['title'] }) {
     const { title, id } = payload

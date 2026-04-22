@@ -16,3 +16,11 @@ export const TaskPriority = {
 } as const
 
 export type TaskPriority = (typeof TaskPriority)[keyof typeof TaskPriority]
+
+export const ResultCode = {
+  Success: 0,
+  Error: 1,
+  CaptchaError: 10,
+}
+
+export type ResultCode = (typeof ResultCode)[keyof typeof ResultCode]

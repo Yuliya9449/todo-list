@@ -1,25 +1,17 @@
 import styles from './App.module.css'
 import { useAppSelector } from '@/common/hooks'
-import { Header } from '@/common/components/Header/Header'
+import { Header } from '@/common/components'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { selectThemeMode } from '@/app/model/app-slice'
 import { getTheme } from '@/common/theme/theme'
 import { Main } from '@/app/Main'
-import type { DomainTodolist } from '@/features/todolists/model/todolists-slice'
-import type { DomainTask } from '@/features/todolists/api/tasksApi.types'
-
-export type Task = {
-  id: string
-  title: string
-  isDone: boolean
-}
-
-export type TasksState = Record<DomainTodolist['id'], DomainTask[]>
+import { useMemo } from 'react'
+import { ErrorSnackbar } from '@/common/components'
 
 export const App = () => {
   const themeMode = useAppSelector(selectThemeMode)
-  const theme = getTheme(themeMode)
+  const theme = useMemo(() => getTheme(themeMode), [themeMode])
 
   return (
     <ThemeProvider theme={theme}>
@@ -27,6 +19,7 @@ export const App = () => {
         <CssBaseline />
         <Header />
         <Main />
+        <ErrorSnackbar />
       </div>
     </ThemeProvider>
   )

@@ -6,9 +6,8 @@ import MenuIcon from '@mui/icons-material/Menu'
 import { NavButton } from '@/common/components/NavButton/NavButton'
 import Switch from '@mui/material/Switch'
 import LinearProgress from '@mui/material/LinearProgress'
-import { changeThemeModeAC, selectRequestStatus } from '@/app/model/app-slice'
+import { changeThemeModeAC, selectRequestStatus, selectThemeMode } from '@/app/model/app-slice'
 import { useAppDispatch, useAppSelector } from '@/common/hooks'
-import { selectThemeMode } from '@/app/model/app-slice'
 import { getTheme } from '@/common/theme/theme'
 
 export const Header = () => {

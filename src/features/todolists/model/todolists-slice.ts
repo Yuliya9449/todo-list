@@ -1,7 +1,8 @@
 import type { Todolist } from '@/features/todolists/api/todolistsApi.types'
-import { createAppSlice } from '@/common/utils'
+import { createAppSlice, handleCatchError, handleStatusCodeError } from '@/common/utils'
 import { todolistsApi } from '@/features/todolists/api/todolistsApi'
 import { setRequestStatusAC } from '@/app/model/app-slice'
+import { ResultCode } from '@/common/enums'
 
 export const todolistsSlice = createAppSlice({
   name: 'todolists',
@@ -15,11 +16,11 @@ export const todolistsSlice = createAppSlice({
       async (_, { dispatch, rejectWithValue }) => {
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
-          const res = await todolistsApi.getTodolists()
+          const { data } = await todolistsApi.getTodolists()
           dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
-          return res.data
-        } catch {
-          dispatch(setRequestStatusAC({ requestStatus: 'failed' }))
+          return data
+        } catch (error) {
+          handleCatchError({ error, dispatch })
           return rejectWithValue(null)
         }
       },
@@ -33,11 +34,17 @@ export const todolistsSlice = createAppSlice({
       async (title: DomainTodolist['title'], { dispatch, rejectWithValue }) => {
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
-          const res = await todolistsApi.createTodolist(title)
-          dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
-          return { todolist: res.data.data.item }
-        } catch {
-          dispatch(setRequestStatusAC({ requestStatus: 'failed' }))
+          const { data } = await todolistsApi.createTodolist(title)
+
+          if (data.resultCode === ResultCode.Success) {
+            dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
+            return { todolist: data.data.item }
+          } else {
+            handleStatusCodeError({ data, dispatch })
+            return rejectWithValue(null)
+          }
+        } catch (error) {
+          handleCatchError({ error, dispatch })
           return rejectWithValue(null)
         }
       },
@@ -52,11 +59,18 @@ export const todolistsSlice = createAppSlice({
         try {
           dispatch(setTodolistIsDisabledAC({ id: arg.id, isDisabled: true }))
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
-          await todolistsApi.deleteTodolist(arg.id)
-          dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
-          return arg
-        } catch {
-          dispatch(setRequestStatusAC({ requestStatus: 'failed' }))
+          const { data } = await todolistsApi.deleteTodolist(arg.id)
+
+          if (data.resultCode === ResultCode.Success) {
+            dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
+            return arg
+          } else {
+            dispatch(setTodolistIsDisabledAC({ id: arg.id, isDisabled: false }))
+            handleStatusCodeError({ data, dispatch })
+            return rejectWithValue(null)
+          }
+        } catch (error) {
+          handleCatchError({ error, dispatch })
           dispatch(setTodolistIsDisabledAC({ id: arg.id, isDisabled: false }))
           return rejectWithValue(null)
         }
@@ -74,11 +88,17 @@ export const todolistsSlice = createAppSlice({
       async (arg: { id: DomainTodolist['id']; title: DomainTodolist['title'] }, { dispatch, rejectWithValue }) => {
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
-          await todolistsApi.changeTodolistTitle(arg)
-          dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
-          return arg
-        } catch {
-          dispatch(setRequestStatusAC({ requestStatus: 'failed' }))
+          const { data } = await todolistsApi.changeTodolistTitle(arg)
+
+          if (data.resultCode === ResultCode.Success) {
+            dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
+            return arg
+          } else {
+            handleStatusCodeError({ data, dispatch })
+            return rejectWithValue(null)
+          }
+        } catch (error) {
+          handleCatchError({ error, dispatch })
           return rejectWithValue(null)
         }
       },

@@ -16,8 +16,8 @@ const todolistId2 = nanoid()
 
 beforeEach(() => {
   startState = [
-    { id: todolistId1, title: 'What to learn', addedDate: '', order: 0, filter: 'all' },
-    { id: todolistId2, title: 'What to buy', addedDate: '', order: 0, filter: 'all' },
+    { id: todolistId1, title: 'What to learn', addedDate: '', order: 0, filter: 'all', isDisabled: false },
+    { id: todolistId2, title: 'What to buy', addedDate: '', order: 0, filter: 'all', isDisabled: false },
   ]
 })
 
@@ -39,7 +39,16 @@ test('should not affect other todolists when one is deleted', () => {
     deleteTodolistTC.fulfilled({ id: todolistId1 }, 'requestId', { id: todolistId1 }),
   )
 
-  expect(endState).toEqual([{ id: todolistId2, title: 'What to buy', addedDate: '', order: 0, filter: 'all' }])
+  expect(endState).toEqual([
+    {
+      id: todolistId2,
+      title: 'What to buy',
+      addedDate: '',
+      order: 0,
+      filter: 'all',
+      isDisabled: false,
+    },
+  ])
 })
 
 test('should return same state if todolist not found', () => {

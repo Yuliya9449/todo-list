@@ -4,9 +4,12 @@ import { tasksApi } from '@/features/todolists/api/tasksApi'
 import type { DomainTask } from '@/features/todolists/api/tasksApi.types'
 import { createAppSlice } from '@/common/utils'
 import { setRequestStatusAC } from '@/app/model/app-slice'
+import { ResultCode } from '@/common/enums'
+import { handleCatchError } from '@/common/utils/'
+import { handleStatusCodeError } from '@/common/utils/'
 
 export const tasksSlice = createAppSlice({
-  name: 'tasksReducer',
+  name: 'tasks',
   initialState: {} as TasksState,
   selectors: {
     selectTasks: (sliceState) => sliceState,
@@ -21,15 +24,15 @@ export const tasksSlice = createAppSlice({
       })
   },
   reducers: (create) => ({
-    fetchTodolistsTC: create.asyncThunk(
+    fetchTasksTC: create.asyncThunk(
       async (todolistId: DomainTodolist['id'], { dispatch, rejectWithValue }) => {
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
-          const res = await tasksApi.getTasks(todolistId)
+          const { data } = await tasksApi.getTasks(todolistId)
           dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
-          return { todolistId, tasks: res.data.items }
-        } catch {
-          dispatch(setRequestStatusAC({ requestStatus: 'failed' }))
+          return { todolistId, tasks: data.items }
+        } catch (error) {
+          handleCatchError({ error, dispatch })
           return rejectWithValue(null)
         }
       },
@@ -50,11 +53,16 @@ export const tasksSlice = createAppSlice({
       ) => {
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
-          const res = await tasksApi.createTask(arg)
-          dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
-          return res.data.data.item
-        } catch {
-          dispatch(setRequestStatusAC({ requestStatus: 'failed' }))
+          const { data } = await tasksApi.createTask(arg)
+          if (data.resultCode === ResultCode.Success) {
+            dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
+            return data.data.item
+          } else {
+            handleStatusCodeError({ data, dispatch })
+            return rejectWithValue(null)
+          }
+        } catch (error) {
+          handleCatchError({ error, dispatch })
           return rejectWithValue(null)
         }
       },
@@ -78,10 +86,17 @@ export const tasksSlice = createAppSlice({
       ) => {
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
-          await tasksApi.deleteTask(arg)
-          dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
-          return arg
-        } catch {
+          const { data } = await tasksApi.deleteTask(arg)
+
+          if (data.resultCode === ResultCode.Success) {
+            dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
+            return arg
+          } else {
+            handleStatusCodeError({ data, dispatch })
+            return rejectWithValue(null)
+          }
+        } catch (error) {
+          handleCatchError({ error, dispatch })
           dispatch(setRequestStatusAC({ requestStatus: 'failed' }))
           return rejectWithValue(null)
         }
@@ -105,10 +120,17 @@ export const tasksSlice = createAppSlice({
       async (updatedTask: DomainTask, { dispatch, rejectWithValue }) => {
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
-          const res = await tasksApi.updateTask(updatedTask)
-          dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
-          return res.data.data.item
-        } catch {
+          const { data } = await tasksApi.updateTask(updatedTask)
+
+          if (data.resultCode === ResultCode.Success) {
+            dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
+            return data.data.item
+          } else {
+            handleStatusCodeError({ data, dispatch })
+            return rejectWithValue(null)
+          }
+        } catch (error) {
+          handleCatchError({ error, dispatch })
           dispatch(setRequestStatusAC({ requestStatus: 'failed' }))
           return rejectWithValue(null)
         }
@@ -130,7 +152,7 @@ export const tasksSlice = createAppSlice({
   }),
 })
 
-export const { fetchTodolistsTC, createTaskTC, deleteTaskTC, changeTaskTC } = tasksSlice.actions
+export const { fetchTasksTC, createTaskTC, deleteTaskTC, changeTaskTC } = tasksSlice.actions
 export const { selectTasks } = tasksSlice.selectors
 export const tasksReducer = tasksSlice.reducer
 

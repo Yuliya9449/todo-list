@@ -1,7 +1,7 @@
 import List from '@mui/material/List'
 import { useAppDispatch, useAppSelector } from '@/common/hooks'
 import { TaskItem } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TaskItem/TaskItem'
-import { fetchTodolistsTC, selectTasks } from '@/features/todolists/model/tasks-slice'
+import { fetchTasksTC, selectTasks } from '@/features/todolists/model/tasks-slice'
 import type { DomainTodolist, FilterValues } from '@/features/todolists/model/todolists-slice'
 import { useEffect } from 'react'
 import type { DomainTask } from '@/features/todolists/api/tasksApi.types'
@@ -30,7 +30,7 @@ export const Tasks = ({ todolist }: Props) => {
   const filteredTasks = getFilteredTasks(todolistTasks, todolist.filter)
 
   useEffect(() => {
-    dispatch(fetchTodolistsTC(todolist.id))
+    dispatch(fetchTasksTC(todolist.id))
   }, [dispatch, todolist.id])
 
   return (
