@@ -1,13 +1,12 @@
 import styles from './App.module.css'
 import { useAppSelector } from '@/common/hooks'
-import { Header } from '@/common/components'
+import { ErrorSnackbar, Header } from '@/common/components'
 import { ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import { selectThemeMode } from '@/app/model/app-slice'
 import { getTheme } from '@/common/theme/theme'
-import { Main } from '@/app/Main'
 import { useMemo } from 'react'
-import { ErrorSnackbar } from '@/common/components'
+import { Routing } from '@/common/components'
 
 export const App = () => {
   const themeMode = useAppSelector(selectThemeMode)
@@ -18,7 +17,7 @@ export const App = () => {
       <div className={styles.app}>
         <CssBaseline />
         <Header />
-        <Main />
+        <Routing />
         <ErrorSnackbar />
       </div>
     </ThemeProvider>
