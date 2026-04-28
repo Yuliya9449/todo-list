@@ -5,8 +5,8 @@ import {
   deleteTaskTC,
   tasksReducer,
   type TasksState,
-} from '@/features/todolists/model/tasks-slice'
-import { createTodolistTC, deleteTodolistTC } from '@/features/todolists/model/todolists-slice'
+} from '@/features/todolists/model/slices/tasks-slice'
+import { createTodolistTC, deleteTodolistTC } from '@/features/todolists/model/slices/todolists-slice'
 import { TaskPriority, TaskStatus } from '@/common/enums'
 import type { DomainTask } from '@/features/todolists/api/tasksApi.types'
 import { nanoid } from '@reduxjs/toolkit'

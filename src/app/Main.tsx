@@ -2,9 +2,9 @@ import Grid from '@mui/material/Grid'
 import { CreateItemForm } from '@/common/components/CreateItemForm/CreateItemForm'
 import { Todolists } from '@/features/todolists/ui/Todolists/Todolists'
 import Container from '@mui/material/Container'
-import { createTodolistTC } from '@/features/todolists/model/todolists-slice'
+import { createTodolistTC } from '@/features/todolists/model/slices/todolists-slice'
 import { useAppDispatch } from '@/common/hooks'
-import type { DomainTodolist } from '@/features/todolists/model/todolists-slice'
+import type { DomainTodolist } from '@/features/todolists/model/slices/todolists-slice'
 
 export const Main = () => {
   const dispatch = useAppDispatch()

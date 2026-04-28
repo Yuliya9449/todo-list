@@ -1,6 +1,6 @@
 import { instance } from '@/common/instance/instance'
 import type { Todolist } from '@/features/todolists/api/todolistsApi.types'
-import type { DomainTodolist } from '@/features/todolists/model/todolists-slice'
+import type { DomainTodolist } from '@/features/todolists/model/slices/todolists-slice'
 import type { BaseResponse } from '@/common/types'
 
 export const todolistsApi = {

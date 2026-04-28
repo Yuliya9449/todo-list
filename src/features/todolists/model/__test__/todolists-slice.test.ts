@@ -6,7 +6,7 @@ import {
   deleteTodolistTC,
   type DomainTodolist,
   todolistsReducer,
-} from '@/features/todolists/model/todolists-slice'
+} from '@/features/todolists/model/slices/todolists-slice'
 import { nanoid } from '@reduxjs/toolkit'
 
 let startState: DomainTodolist[] = []

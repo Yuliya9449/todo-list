@@ -19,9 +19,10 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
-      'no-console': ['warn', { allow: ['warn', 'error'] }], // Предупреждать о console.log, но разрешить warn и error
+      'no-console': ['error', { allow: ['warn', 'error'] }], // Предупреждать о console.log, но разрешить warn и error
       'no-debugger': 'warn', // предупреждение о debugger
-      'no-unused-vars': 'off', // Отключаем базовое правило (неиспользуемые переменные)
+      'no-unused-vars': 'warn', // Отключаем базовое правило (неиспользуемые переменные)
+      'no-useless-assignment': 'warn',
       '@typescript-eslint/no-unused-vars': [
         'warn',
         {

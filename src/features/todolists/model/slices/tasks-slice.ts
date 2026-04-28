@@ -1,12 +1,12 @@
-import type { DomainTodolist } from '@/features/todolists/model/todolists-slice'
-import { createTodolistTC, deleteTodolistTC } from '@/features/todolists/model/todolists-slice'
+import type { DomainTodolist } from '@/features/todolists/model/slices/todolists-slice'
+import { createTodolistTC, deleteTodolistTC } from '@/features/todolists/model/slices/todolists-slice'
 import { tasksApi } from '@/features/todolists/api/tasksApi'
 import type { DomainTask } from '@/features/todolists/api/tasksApi.types'
 import { createAppSlice } from '@/common/utils'
 import { setRequestStatusAC } from '@/app/model/app-slice'
 import { ResultCode } from '@/common/enums'
-import { handleCatchError } from '@/common/utils/'
-import { handleStatusCodeError } from '@/common/utils/'
+import { handleCatchError, handleStatusCodeError } from '@/common/utils'
+import { domainTaskSchema } from '@/features/todolists/model/schemas'
 
 export const tasksSlice = createAppSlice({
   name: 'tasks',
@@ -29,6 +29,7 @@ export const tasksSlice = createAppSlice({
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
           const { data } = await tasksApi.getTasks(todolistId)
+          domainTaskSchema.array().parse(data.items) // 💎
           dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
           return { todolistId, tasks: data.items }
         } catch (error) {

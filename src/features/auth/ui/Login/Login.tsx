@@ -10,23 +10,8 @@ import { selectThemeMode } from '@/app/model/app-slice'
 import { getTheme } from '@/common/theme/theme'
 import Grid from '@mui/material/Grid'
 import { Controller, useForm } from 'react-hook-form'
-
-const validationRules = {
-  email: {
-    required: 'Email is required',
-    pattern: { value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/, message: 'Incorrect email address' },
-  },
-  password: {
-    required: 'Password is required',
-    minLength: { value: 4, message: 'Password length is min 4' },
-  },
-}
-
-type LoginInputs = {
-  email: string
-  password: string
-  rememberMe: boolean
-}
+import { zodResolver } from '@hookform/resolvers/zod'
+import { type LoginInputs, loginSchema } from '@/features/auth/model/schemas'
 
 export const Login = () => {
   const themeMode = useAppSelector(selectThemeMode)
@@ -41,10 +26,11 @@ export const Login = () => {
       password: '',
       rememberMe: false,
     },
+    resolver: zodResolver(loginSchema),
   })
 
   const submitHandler = (data: LoginInputs) => {
-    console.log('data: ', data)
+    console.warn('data: ', data)
     reset()
   }
 
@@ -83,7 +69,6 @@ export const Login = () => {
             <Controller
               name="email"
               control={control}
-              rules={validationRules.email}
               render={({ field }) => (
                 <TextField
                   {...field}
@@ -100,7 +85,6 @@ export const Login = () => {
             <Controller
               name="password"
               control={control}
-              rules={validationRules.password}
               render={({ field }) => {
                 return (
                   <TextField

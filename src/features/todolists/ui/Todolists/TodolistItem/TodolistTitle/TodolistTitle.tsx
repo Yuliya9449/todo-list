@@ -1,9 +1,9 @@
 import Grid from '@mui/material/Grid'
 import { EditableSpan } from '@/common/components/EditableSpan/EditableSpan'
-import { changeTodolistTitleTC, deleteTodolistTC } from '@/features/todolists/model/todolists-slice'
+import { changeTodolistTitleTC, deleteTodolistTC } from '@/features/todolists/model/slices/todolists-slice'
 import { useAppDispatch } from '@/common/hooks'
 import { DeleteButton } from '@/common/components/DeleteButton/DeleteButton'
-import type { DomainTodolist } from '@/features/todolists/model/todolists-slice'
+import type { DomainTodolist } from '@/features/todolists/model/slices/todolists-slice'
 
 type Props = {
   todolist: DomainTodolist
