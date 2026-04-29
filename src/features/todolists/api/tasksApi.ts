@@ -1,7 +1,12 @@
 import { instance } from '@/common/instance/instance'
-import type { DomainTask, GetTasksResponse, UpdateTaskModel } from '@/features/todolists/api/tasksApi.types'
+import type {
+  DomainTask,
+  GetTasksResponse,
+  ResponseWithItemTask,
+  UpdateTaskModel,
+} from '@/features/todolists/api/tasksApi.types'
 import type { DomainTodolist } from '@/features/todolists/model/slices/todolists-slice'
-import type { BaseResponse } from '@/common/types'
+import type { BaseResponse, ResponseWithEmptyObject } from '@/common/types'
 
 export const tasksApi = {
   getTasks(todolistId: DomainTodolist['id']) {
@@ -13,7 +18,7 @@ export const tasksApi = {
   },
   deleteTask(payload: { todolistId: DomainTodolist['id']; taskId: DomainTask['id'] }) {
     const { todolistId, taskId } = payload
-    return instance.delete<BaseResponse>(`/todo-lists/${todolistId}/tasks/${taskId}`)
+    return instance.delete<ResponseWithEmptyObject>(`/todo-lists/${todolistId}/tasks/${taskId}`)
   },
   updateTask(updatedTask: DomainTask) {
     const model: UpdateTaskModel = {
@@ -25,10 +30,6 @@ export const tasksApi = {
       deadline: updatedTask.deadline,
     }
 
-    return instance.put<
-      BaseResponse<{
-        item: DomainTask
-      }>
-    >(`/todo-lists/${updatedTask.todoListId}/tasks/${updatedTask.id}`, model)
+    return instance.put<ResponseWithItemTask>(`/todo-lists/${updatedTask.todoListId}/tasks/${updatedTask.id}`, model)
   },
 }

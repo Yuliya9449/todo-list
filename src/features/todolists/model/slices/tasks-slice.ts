@@ -1,12 +1,15 @@
 import type { DomainTodolist } from '@/features/todolists/model/slices/todolists-slice'
 import { createTodolistTC, deleteTodolistTC } from '@/features/todolists/model/slices/todolists-slice'
 import { tasksApi } from '@/features/todolists/api/tasksApi'
-import type { DomainTask } from '@/features/todolists/api/tasksApi.types'
-import { createAppSlice } from '@/common/utils'
+import {
+  type DomainTask,
+  getTasksResponseSchema,
+  responseWithItemTaskSchema,
+} from '@/features/todolists/api/tasksApi.types'
+import { createAppSlice, handleCatchError, handleStatusCodeError } from '@/common/utils'
 import { setRequestStatusAC } from '@/app/model/app-slice'
 import { ResultCode } from '@/common/enums'
-import { handleCatchError, handleStatusCodeError } from '@/common/utils'
-import { domainTaskSchema } from '@/features/todolists/model/schemas'
+import { responseWithEmptyObjectSchema } from '@/common/types'
 
 export const tasksSlice = createAppSlice({
   name: 'tasks',
@@ -29,7 +32,7 @@ export const tasksSlice = createAppSlice({
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
           const { data } = await tasksApi.getTasks(todolistId)
-          domainTaskSchema.array().parse(data.items) // 💎
+          getTasksResponseSchema.parse(data) // 💎 zod
           dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
           return { todolistId, tasks: data.items }
         } catch (error) {
@@ -55,6 +58,7 @@ export const tasksSlice = createAppSlice({
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
           const { data } = await tasksApi.createTask(arg)
+          responseWithItemTaskSchema.parse(data) // 💎 zod
           if (data.resultCode === ResultCode.Success) {
             dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
             return data.data.item
@@ -88,7 +92,7 @@ export const tasksSlice = createAppSlice({
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
           const { data } = await tasksApi.deleteTask(arg)
-
+          responseWithEmptyObjectSchema.parse(data) // 💎 zod
           if (data.resultCode === ResultCode.Success) {
             dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
             return arg
@@ -122,7 +126,7 @@ export const tasksSlice = createAppSlice({
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
           const { data } = await tasksApi.updateTask(updatedTask)
-
+          responseWithItemTaskSchema.parse(data) // 💎 zod
           if (data.resultCode === ResultCode.Success) {
             dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
             return data.data.item
