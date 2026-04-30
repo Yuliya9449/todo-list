@@ -6,8 +6,6 @@ export const fieldErrorSchema = z.object({
   field: z.string(),
 })
 
-export type FieldError = z.infer<typeof fieldErrorSchema>
-
 export const createResponseSchema = <T extends z.ZodType>(dataSchema: T) =>
   z.object({
     data: dataSchema,
@@ -16,15 +14,10 @@ export const createResponseSchema = <T extends z.ZodType>(dataSchema: T) =>
     fieldsErrors: fieldErrorSchema.array(),
   })
 
+export type ApiResponse<T extends z.ZodType> = z.infer<ReturnType<typeof createResponseSchema<T>>>
+
 export const responseWithEmptyObjectSchema = createResponseSchema(z.object({}))
 
 export type ResponseWithEmptyObject = z.infer<typeof responseWithEmptyObjectSchema>
-
-export type BaseResponse<T = object> = {
-  data: T
-  resultCode: ResultCode
-  messages: string[]
-  fieldsErrors: FieldError[]
-}
 
 export type RequestStatus = 'idle' | 'loading' | 'succeeded' | 'failed'
