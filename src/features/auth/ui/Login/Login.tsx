@@ -1,4 +1,4 @@
-import { useAppSelector } from '@/common/hooks'
+import { useAppDispatch, useAppSelector } from '@/common/hooks'
 import Button from '@mui/material/Button'
 import Checkbox from '@mui/material/Checkbox'
 import FormControl from '@mui/material/FormControl'
@@ -12,9 +12,11 @@ import Grid from '@mui/material/Grid'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { type LoginInputs, loginSchema } from '@/features/auth/model/schemas'
+import { loginTC } from '@/features/auth/model/slices/auth-slice'
 
 export const Login = () => {
   const themeMode = useAppSelector(selectThemeMode)
+  const dispatch = useAppDispatch()
   const {
     handleSubmit,
     reset,
@@ -30,7 +32,7 @@ export const Login = () => {
   })
 
   const submitHandler = (data: LoginInputs) => {
-    console.warn('data: ', data)
+    dispatch(loginTC(data))
     reset()
   }
 
