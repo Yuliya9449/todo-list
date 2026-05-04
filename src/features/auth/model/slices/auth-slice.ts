@@ -18,14 +18,14 @@ export const authSlice = createAppSlice({
           try {
             dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
             const { data } = await authApi.login(arg)
-            const validatedData = loginResponseSchema.parse(data) // 💎 zod
-            if (validatedData.resultCode === ResultCode.Success) {
+            if (data.resultCode === ResultCode.Success) {
+              const validatedData = loginResponseSchema.parse(data) // 💎 zod
               dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
               localStorage.setItem(AUTH_TOKEN, validatedData.data.token)
               // ! в validatedData ещё userId
               return // ! пустой
             } else {
-              handleStatusCodeError({ data: validatedData, dispatch })
+              handleStatusCodeError({ data, dispatch })
               return rejectWithValue(null)
             }
           } catch (error) {

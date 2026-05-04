@@ -1,4 +1,4 @@
-import { instance } from '@/common/instance/instance'
+import { instance } from '@/common/instance'
 import type {
   DomainTask,
   GetTasksResponse,

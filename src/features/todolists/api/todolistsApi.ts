@@ -1,4 +1,4 @@
-import { instance } from '@/common/instance/instance'
+import { instance } from '@/common/instance'
 import type { ResponseWithItemTodolist, Todolist } from '@/features/todolists/api/todolistsApi.types'
 import type { DomainTodolist } from '@/features/todolists/model/slices/todolists-slice'
 import type { ResponseWithEmptyObject } from '@/common/types'

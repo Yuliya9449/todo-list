@@ -12,11 +12,18 @@ import Grid from '@mui/material/Grid'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { type LoginInputs, loginSchema } from '@/features/auth/model/schemas'
-import { loginTC } from '@/features/auth/model/slices/auth-slice'
+import { loginTC, selectIsLoggedIn } from '@/features/auth/model/slices/auth-slice'
+import { Navigate } from 'react-router'
+import { Path } from '@/common/components'
 
 export const Login = () => {
   const themeMode = useAppSelector(selectThemeMode)
+  const theme = getTheme(themeMode)
+
+  const isLoggedIn = useAppSelector(selectIsLoggedIn)
+
   const dispatch = useAppDispatch()
+
   const {
     handleSubmit,
     reset,
@@ -38,7 +45,9 @@ export const Login = () => {
 
   // console.log('errors: ', errors)
 
-  const theme = getTheme(themeMode)
+  if (isLoggedIn) {
+    return <Navigate to={Path.Main} />
+  }
 
   return (
     <Grid

@@ -1,4 +1,4 @@
-import { instance } from '@/common/instance/instance'
+import { instance } from '@/common/instance'
 import type { LoginInputs } from '@/features/auth/model/schemas'
 import type { LoginResponse } from '@/features/auth/api/authApi.types'
 
