@@ -10,10 +10,13 @@ import { createAppSlice, handleCatchError, handleStatusCodeError } from '@/commo
 import { setRequestStatusAC } from '@/app/model/app-slice'
 import { ResultCode } from '@/common/enums'
 import { responseWithEmptyObjectSchema } from '@/common/types'
+import { clearDataAC } from '@/common/actions'
+
+const initialState: TasksState = {}
 
 export const tasksSlice = createAppSlice({
   name: 'tasks',
-  initialState: {} as TasksState,
+  initialState,
   selectors: {
     selectTasks: (sliceState) => sliceState,
   },
@@ -25,6 +28,7 @@ export const tasksSlice = createAppSlice({
       .addCase(deleteTodolistTC.fulfilled, (state, action) => {
         delete state[action.payload.id]
       })
+      .addCase(clearDataAC, () => initialState)
   },
   reducers: (create) => ({
     fetchTasksTC: create.asyncThunk(

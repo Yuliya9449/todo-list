@@ -8,12 +8,18 @@ import { todolistsApi } from '@/features/todolists/api/todolistsApi'
 import { setRequestStatusAC } from '@/app/model/app-slice'
 import { ResultCode } from '@/common/enums'
 import { responseWithEmptyObjectSchema } from '@/common/types'
+import { clearDataAC } from '@/common/actions'
+
+const initialState: DomainTodolist[] = []
 
 export const todolistsSlice = createAppSlice({
   name: 'todolists',
-  initialState: [] as DomainTodolist[],
+  initialState,
   selectors: {
     selectTodolists: (sliceState): DomainTodolist[] => sliceState,
+  },
+  extraReducers: (builder) => {
+    builder.addCase(clearDataAC, () => initialState)
   },
   reducers: (create) => ({
     // thunks

@@ -4,6 +4,7 @@ import { authApi } from '@/features/auth/api/authApi'
 import { setRequestStatusAC } from '@/app/model/app-slice'
 import { ResultCode } from '@/common/enums'
 import { AUTH_TOKEN } from '@/common/constants'
+import { clearDataAC } from '@/common/actions'
 
 export const authSlice = createAppSlice({
   name: 'auth',
@@ -39,10 +40,37 @@ export const authSlice = createAppSlice({
           },
         },
       ),
+      logoutTC: create.asyncThunk(
+        async (_arg, { dispatch, rejectWithValue }) => {
+          try {
+            dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
+            const { data } = await authApi.logout()
+
+            if (data.resultCode === ResultCode.Success) {
+              dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
+              localStorage.removeItem(AUTH_TOKEN)
+              dispatch(clearDataAC())
+              return // ! ! пустой
+            } else {
+              handleStatusCodeError({ data, dispatch })
+              return rejectWithValue(null)
+            }
+          } catch (error) {
+            handleCatchError({ error, dispatch })
+            dispatch(setRequestStatusAC({ requestStatus: 'failed' }))
+            return rejectWithValue(null)
+          }
+        },
+        {
+          fulfilled: (state, _action) => {
+            state.isLoggedIn = false
+          },
+        },
+      ),
     }
   },
 })
 
-export const { loginTC } = authSlice.actions
+export const { loginTC, logoutTC } = authSlice.actions
 export const { selectIsLoggedIn } = authSlice.selectors
 export const authReducer = authSlice.reducer
