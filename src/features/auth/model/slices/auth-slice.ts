@@ -1,5 +1,5 @@
 import { createAppSlice, handleCatchError, handleStatusCodeError } from '@/common/utils'
-import { type LoginInputs, loginResponseSchema } from '@/features/auth/model/schemas'
+import { type LoginInputs, loginResponseSchema, meResponseSchema } from '@/features/auth/model/schemas'
 import { authApi } from '@/features/auth/api/authApi'
 import { setRequestStatusAC } from '@/app/model/app-slice'
 import { ResultCode } from '@/common/enums'
@@ -8,9 +8,16 @@ import { clearDataAC } from '@/common/actions'
 
 export const authSlice = createAppSlice({
   name: 'auth',
-  initialState: { isLoggedIn: false },
+  initialState: {
+    isLoggedIn: false,
+    loginName: null,
+  } as {
+    isLoggedIn: boolean
+    loginName: string | null
+  },
   selectors: {
     selectIsLoggedIn: (sliceState) => sliceState.isLoggedIn,
+    selectLoginName: (sliceState) => sliceState.loginName,
   },
   reducers: (create) => {
     return {
@@ -24,7 +31,9 @@ export const authSlice = createAppSlice({
               dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
               localStorage.setItem(AUTH_TOKEN, validatedData.data.token)
               // ! в validatedData ещё userId
-              return // ! пустой
+              return {
+                isLoggedIn: true,
+              }
             } else {
               handleStatusCodeError({ data, dispatch })
               return rejectWithValue(null)
@@ -35,8 +44,8 @@ export const authSlice = createAppSlice({
           }
         },
         {
-          fulfilled: (state, _action) => {
-            state.isLoggedIn = true
+          fulfilled: (state, action) => {
+            state.isLoggedIn = action.payload.isLoggedIn
           },
         },
       ),
@@ -50,7 +59,10 @@ export const authSlice = createAppSlice({
               dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
               localStorage.removeItem(AUTH_TOKEN)
               dispatch(clearDataAC())
-              return // ! ! пустой
+              return {
+                isLoggedIn: false,
+                loginName: null,
+              }
             } else {
               handleStatusCodeError({ data, dispatch })
               return rejectWithValue(null)
@@ -62,8 +74,34 @@ export const authSlice = createAppSlice({
           }
         },
         {
-          fulfilled: (state, _action) => {
-            state.isLoggedIn = false
+          fulfilled: (state, action) => {
+            state.isLoggedIn = action.payload.isLoggedIn
+            state.loginName = action.payload.loginName
+          },
+        },
+      ),
+      meTC: create.asyncThunk(
+        async (_, { dispatch, rejectWithValue }) => {
+          try {
+            dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
+            const { data } = await authApi.me()
+            if (data.resultCode === ResultCode.Success) {
+              dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
+              const validateDate = meResponseSchema.parse(data)
+              return { isLoggedIn: true, loginName: validateDate.data.login }
+            } else {
+              handleStatusCodeError({ data: data, dispatch })
+              return rejectWithValue(null)
+            }
+          } catch (error) {
+            handleCatchError({ error, dispatch })
+            return rejectWithValue(null)
+          }
+        },
+        {
+          fulfilled: (state, action) => {
+            state.isLoggedIn = action.payload.isLoggedIn
+            state.loginName = action.payload.loginName
           },
         },
       ),
@@ -71,6 +109,6 @@ export const authSlice = createAppSlice({
   },
 })
 
-export const { loginTC, logoutTC } = authSlice.actions
-export const { selectIsLoggedIn } = authSlice.selectors
+export const { loginTC, logoutTC, meTC } = authSlice.actions
+export const { selectIsLoggedIn, selectLoginName } = authSlice.selectors
 export const authReducer = authSlice.reducer

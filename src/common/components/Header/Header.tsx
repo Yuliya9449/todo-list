@@ -9,11 +9,12 @@ import LinearProgress from '@mui/material/LinearProgress'
 import { changeThemeModeAC, selectRequestStatus, selectThemeMode } from '@/app/model/app-slice'
 import { useAppDispatch, useAppSelector } from '@/common/hooks'
 import { getTheme } from '@/common/theme/theme'
-import { logoutTC, selectIsLoggedIn } from '@/features/auth/model/slices/auth-slice'
+import { logoutTC, selectIsLoggedIn, selectLoginName } from '@/features/auth/model/slices/auth-slice'
 
 export const Header = () => {
   const requestStatus = useAppSelector(selectRequestStatus)
   const isLoggedIn = useAppSelector(selectIsLoggedIn)
+  const loginName = useAppSelector(selectLoginName)
 
   const dispatch = useAppDispatch()
 
@@ -37,6 +38,7 @@ export const Header = () => {
             <MenuIcon />
           </IconButton>
           <div>
+            <span style={{ marginRight: '16px' }}>{loginName || 'User'}</span>
             {isLoggedIn && <NavButton onClick={logoutHandler}>Logout</NavButton>}
             <NavButton background={theme.palette.primary.dark}>Faq</NavButton>
             <Switch

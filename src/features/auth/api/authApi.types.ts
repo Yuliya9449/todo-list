@@ -1,4 +1,5 @@
 import * as z from 'zod'
-import { loginResponseSchema } from '@/features/auth/model/schemas'
+import { loginResponseSchema, meResponseSchema } from '@/features/auth/model/schemas'
 
 export type LoginResponse = z.infer<typeof loginResponseSchema>
+export type MeResponse = z.infer<typeof meResponseSchema>

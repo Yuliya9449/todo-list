@@ -12,7 +12,7 @@ import Grid from '@mui/material/Grid'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { type LoginInputs, loginSchema } from '@/features/auth/model/schemas'
-import { loginTC, selectIsLoggedIn } from '@/features/auth/model/slices/auth-slice'
+import { loginTC, meTC, selectIsLoggedIn } from '@/features/auth/model/slices/auth-slice'
 import { Navigate } from 'react-router'
 import { Path } from '@/common/components'
 
@@ -40,10 +40,10 @@ export const Login = () => {
 
   const submitHandler = (data: LoginInputs) => {
     dispatch(loginTC(data))
+      .unwrap()
+      .then(() => dispatch(meTC()))
     reset()
   }
-
-  // console.log('errors: ', errors)
 
   if (isLoggedIn) {
     return <Navigate to={Path.Main} />
