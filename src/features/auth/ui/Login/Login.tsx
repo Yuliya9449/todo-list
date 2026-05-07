@@ -12,15 +12,11 @@ import Grid from '@mui/material/Grid'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { type LoginInputs, loginSchema } from '@/features/auth/model/schemas'
-import { loginTC, meTC, selectIsLoggedIn } from '@/features/auth/model/slices/auth-slice'
-import { Navigate } from 'react-router'
-import { Path } from '@/common/components'
+import { loginTC, meTC } from '@/features/auth/model/slices/auth-slice'
 
 export const Login = () => {
   const themeMode = useAppSelector(selectThemeMode)
   const theme = getTheme(themeMode)
-
-  const isLoggedIn = useAppSelector(selectIsLoggedIn)
 
   const dispatch = useAppDispatch()
 
@@ -45,15 +41,8 @@ export const Login = () => {
     reset()
   }
 
-  if (isLoggedIn) {
-    return <Navigate to={Path.Main} />
-  }
-
   return (
-    <Grid
-      container
-      sx={{ justifyContent: 'center' }}
-    >
+    <Grid container sx={{ justifyContent: 'center' }}>
       <FormControl component="fieldset">
         <FormLabel>
           <p>
@@ -117,12 +106,7 @@ export const Login = () => {
                 <Controller
                   name="rememberMe"
                   control={control}
-                  render={({ field: { value, ...rest } }) => (
-                    <Checkbox
-                      {...rest}
-                      checked={value}
-                    />
-                  )}
+                  render={({ field: { value, ...rest } }) => <Checkbox {...rest} checked={value} />}
                 />
               }
             />

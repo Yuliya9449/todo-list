@@ -1,40 +1,29 @@
 import { Route, Routes } from 'react-router'
 import { Main } from '@/app/Main'
 import { Login } from '@/features/auth/ui/Login/Login'
-import { PageNotFound } from '@/common/components'
-
-// eslint-disable-next-line react-refresh/only-export-components
-export const Path = {
-  Main: '/',
-  Login: '/login',
-  NotFound: '*',
-} as const
+import { Faq, PageNotFound, ProtectedRoute } from '@/common/components'
+import { useAppSelector } from '@/common/hooks'
+import { selectIsLoggedIn } from '@/features/auth/model/slices/auth-slice'
+import { RoutePath } from '@/common/constants'
 
 export const Routing = () => {
+  const isLoggedIn = useAppSelector(selectIsLoggedIn)
+
   return (
     <Routes>
-      <Route
-        path={Path.Main}
-        element={<Main />}
-      />
-      <Route
-        path={Path.Login}
-        element={<Login />}
-      />{' '}
-      <Route
-        path={Path.NotFound}
-        element={<PageNotFound />}
-      />
-      {/*<Route path="about" element={<About />} />*/}
-      {/*<Route element={<AuthLayout />}>*/}
-      {/*  <Route path="login" element={<Login />} />*/}
-      {/*  <Route path="register" element={<Register />} />*/}
-      {/*</Route>*/}
-      {/*<Route path="concerts">*/}
-      {/*  <Route index element={<ConcertsHome />} />*/}
-      {/*  <Route path=":city" element={<City />} />*/}
-      {/*  <Route path="trending" element={<Trending />} />*/}
-      {/*</Route>*/}
+      {/* Защищенные маршруты - только для авторизованных */}
+      <Route element={<ProtectedRoute isAllowed={isLoggedIn} redirectPath={RoutePath.Login} />}>
+        <Route path={RoutePath.Main} element={<Main />} />
+        <Route path={RoutePath.Faq} element={<Faq />} />
+      </Route>
+
+      {/* Публичные маршруты - только для не авторизованных */}
+      <Route element={<ProtectedRoute isAllowed={!isLoggedIn} redirectPath={RoutePath.Main} />}>
+        <Route path={RoutePath.Login} element={<Login />} />
+      </Route>
+
+      {/* 404 - для всех */}
+      <Route path={RoutePath.NotFound} element={<PageNotFound />} />
     </Routes>
   )
 }

@@ -10,15 +10,18 @@ import { changeThemeModeAC, selectRequestStatus, selectThemeMode } from '@/app/m
 import { useAppDispatch, useAppSelector } from '@/common/hooks'
 import { getTheme } from '@/common/theme/theme'
 import { logoutTC, selectIsLoggedIn, selectLoginName } from '@/features/auth/model/slices/auth-slice'
+import { useNavigate } from 'react-router'
+import { RoutePath } from '@/common/constants'
 
 export const Header = () => {
   const requestStatus = useAppSelector(selectRequestStatus)
   const isLoggedIn = useAppSelector(selectIsLoggedIn)
   const loginName = useAppSelector(selectLoginName)
+  const themeMode = useAppSelector(selectThemeMode)
 
   const dispatch = useAppDispatch()
 
-  const themeMode = useAppSelector(selectThemeMode)
+  const navigate = useNavigate()
 
   const theme = getTheme(themeMode)
 
@@ -39,12 +42,12 @@ export const Header = () => {
           </IconButton>
           <div>
             <span style={{ marginRight: '16px' }}>{loginName || 'User'}</span>
+            <NavButton onClick={() => navigate(RoutePath.Main)}>Todolists</NavButton>
+            <NavButton onClick={() => navigate(RoutePath.Faq)} background={theme.palette.primary.dark}>
+              Faq
+            </NavButton>
             {isLoggedIn && <NavButton onClick={logoutHandler}>Logout</NavButton>}
-            <NavButton background={theme.palette.primary.dark}>Faq</NavButton>
-            <Switch
-              color={'default'}
-              onChange={changeModeHandler}
-            />
+            <Switch color={'default'} onChange={changeModeHandler} />
           </div>
         </Container>
       </Toolbar>
