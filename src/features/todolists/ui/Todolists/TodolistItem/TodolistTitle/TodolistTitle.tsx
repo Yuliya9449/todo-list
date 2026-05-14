@@ -1,9 +1,8 @@
 import Grid from '@mui/material/Grid'
 import { EditableSpan } from '@/common/components/EditableSpan/EditableSpan'
-import { changeTodolistTitleTC, deleteTodolistTC } from '@/features/todolists/model/slices/todolists-slice'
-import { useAppDispatch } from '@/common/hooks'
-import { DeleteButton } from '@/common/components/DeleteButton/DeleteButton'
 import type { DomainTodolist } from '@/features/todolists/model/slices/todolists-slice'
+import { DeleteButton } from '@/common/components/DeleteButton/DeleteButton'
+import { useChangeTodolistTitleMutation, useDeleteTodolistMutation } from '@/features/todolists/api/todolistsApi'
 
 type Props = {
   todolist: DomainTodolist
@@ -11,30 +10,22 @@ type Props = {
 
 export const TodolistTitle = ({ todolist }: Props) => {
   const { id, title, isDisabled } = todolist
-  const dispatch = useAppDispatch()
 
-  const deleteTodolist = () => {
-    dispatch(deleteTodolistTC({ id }))
+  const [deleteTodolist] = useDeleteTodolistMutation()
+  const [changeTodolistTitle] = useChangeTodolistTitleMutation()
+
+  const deleteTodolistHandler = () => {
+    deleteTodolist(id)
   }
 
-  const changeTodolistTitle = (title: DomainTodolist['title']) => {
-    dispatch(changeTodolistTitleTC({ id, title }))
+  const changeTodolistTitleHandler = (title: DomainTodolist['title']) => {
+    changeTodolistTitle({ id, title })
   }
 
   return (
-    <Grid
-      container
-      sx={{ alignItems: 'center' }}
-    >
-      <EditableSpan
-        disabled={isDisabled}
-        value={title}
-        onChangeValue={changeTodolistTitle}
-      />
-      <DeleteButton
-        disabled={isDisabled}
-        onClick={deleteTodolist}
-      />
+    <Grid container sx={{ alignItems: 'center' }}>
+      <EditableSpan disabled={isDisabled} value={title} onChangeValue={changeTodolistTitleHandler} />
+      <DeleteButton disabled={isDisabled} onClick={deleteTodolistHandler} />
     </Grid>
   )
 }

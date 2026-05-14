@@ -4,7 +4,7 @@ import {
   todolistSchema,
 } from '@/features/todolists/api/todolistsApi.types'
 import { createAppSlice, handleCatchError, handleStatusCodeError } from '@/common/utils'
-import { todolistsApi } from '@/features/todolists/api/todolistsApi'
+import { _todolistsApi } from '@/features/todolists/api/todolistsApi'
 import { setRequestStatusAC } from '@/app/model/app-slice'
 import { ResultCode } from '@/common/enums'
 import { responseWithEmptyObjectSchema } from '@/common/types'
@@ -27,7 +27,7 @@ export const todolistsSlice = createAppSlice({
       async (_, { dispatch, rejectWithValue }) => {
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
-          const { data } = await todolistsApi.getTodolists()
+          const { data } = await _todolistsApi.getTodolists()
           todolistSchema.array().parse(data) // 💎zod
           dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
           return data
@@ -46,7 +46,7 @@ export const todolistsSlice = createAppSlice({
       async (title: DomainTodolist['title'], { dispatch, rejectWithValue }) => {
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
-          const { data } = await todolistsApi.createTodolist(title)
+          const { data } = await _todolistsApi.createTodolist(title)
           responseWithItemTodolistSchema.parse(data) // 💎zod
           if (data.resultCode === ResultCode.Success) {
             dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
@@ -71,7 +71,7 @@ export const todolistsSlice = createAppSlice({
         try {
           dispatch(setTodolistIsDisabledAC({ id: arg.id, isDisabled: true }))
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
-          const { data } = await todolistsApi.deleteTodolist(arg.id)
+          const { data } = await _todolistsApi.deleteTodolist(arg.id)
           responseWithEmptyObjectSchema.parse(data) // 💎zod
           if (data.resultCode === ResultCode.Success) {
             dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
@@ -100,7 +100,7 @@ export const todolistsSlice = createAppSlice({
       async (arg: { id: DomainTodolist['id']; title: DomainTodolist['title'] }, { dispatch, rejectWithValue }) => {
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
-          const { data } = await todolistsApi.changeTodolistTitle(arg)
+          const { data } = await _todolistsApi.changeTodolistTitle(arg)
           responseWithEmptyObjectSchema.parse(data) // 💎zod
           if (data.resultCode === ResultCode.Success) {
             dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
