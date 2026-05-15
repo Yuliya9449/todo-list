@@ -3,8 +3,8 @@ import { Main } from '@/app/Main'
 import { Login } from '@/features/auth/ui/Login/Login'
 import { Faq, PageNotFound, ProtectedRoute } from '@/common/components'
 import { useAppSelector } from '@/common/hooks'
-import { selectIsLoggedIn } from '@/features/auth/model/slices/auth-slice'
 import { RoutePath } from '@/common/constants'
+import { selectIsLoggedIn } from '@/app/model/app-slice'
 
 export const Routing = () => {
   const isLoggedIn = useAppSelector(selectIsLoggedIn)

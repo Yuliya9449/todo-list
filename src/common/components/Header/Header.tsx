@@ -6,14 +6,26 @@ import MenuIcon from '@mui/icons-material/Menu'
 import { NavButton } from '@/common/components/NavButton/NavButton'
 import Switch from '@mui/material/Switch'
 import LinearProgress from '@mui/material/LinearProgress'
-import { changeThemeModeAC, selectRequestStatus, selectThemeMode } from '@/app/model/app-slice'
+import {
+  changeThemeModeAC,
+  selectIsLoggedIn,
+  selectLoginName,
+  selectRequestStatus,
+  selectThemeMode,
+  setIsLoggedInAC,
+  setLoginNameAC,
+} from '@/app/model/app-slice'
 import { useAppDispatch, useAppSelector } from '@/common/hooks'
 import { getTheme } from '@/common/theme/theme'
-import { logoutTC, selectIsLoggedIn, selectLoginName } from '@/features/auth/model/slices/auth-slice'
 import { useNavigate } from 'react-router'
-import { RoutePath } from '@/common/constants'
+import { AUTH_TOKEN, RoutePath } from '@/common/constants'
+import { useLogoutMutation } from '@/features/auth/api/authApi'
+import { ResultCode } from '@/common/enums'
 
 export const Header = () => {
+  const [logout] = useLogoutMutation()
+  // const [meQueryTrigger] = useLazyMeQuery()
+
   const requestStatus = useAppSelector(selectRequestStatus)
   const isLoggedIn = useAppSelector(selectIsLoggedIn)
   const loginName = useAppSelector(selectLoginName)
@@ -30,7 +42,28 @@ export const Header = () => {
   }
 
   const logoutHandler = () => {
-    dispatch(logoutTC())
+    logout()
+      .unwrap()
+      .then((response) => {
+        if (response.resultCode === ResultCode.Success) {
+          localStorage.removeItem(AUTH_TOKEN)
+          dispatch(setIsLoggedInAC({ isLoggedIn: false }))
+          dispatch(setLoginNameAC({ loginName: null }))
+        }
+      })
+    // .then(() => {
+    //   return meQueryTrigger().unwrap()
+    // })
+    // .then((data) => {
+    //   if (data?.resultCode === ResultCode.Success) {
+    //     dispatch(setIsLoggedInAC({ isLoggedIn: true }))
+    //     dispatch(setLoginNameAC({ loginName: data.data.login }))
+    //   } else {
+    //     dispatch(setIsLoggedInAC({ isLoggedIn: false }))
+    //     dispatch(setLoginNameAC({ loginName: null }))
+    //   }
+    //   // ! одна и та же логика в App.tsx, Login.tsx, Header.tsx
+    // })
   }
 
   return (
