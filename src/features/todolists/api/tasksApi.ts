@@ -7,8 +7,64 @@ import type {
 } from '@/features/todolists/api/tasksApi.types'
 import type { DomainTodolist } from '@/features/todolists/model/slices/todolists-slice'
 import type { ResponseWithEmptyObject } from '@/common/types'
+import { baseApi } from '@/app/api/baseApi'
 
-export const tasksApi = {
+export const tasksApi = baseApi.injectEndpoints({
+  endpoints: (build) => ({
+    getTasks: build.query<GetTasksResponse, DomainTodolist['id']>({
+      query: (todolistId) => `/todo-lists/${todolistId}/tasks`,
+      providesTags: ['Task'],
+    }),
+    createTask: build.mutation<ResponseWithItemTask, { todolistId: DomainTodolist['id']; title: DomainTask['title'] }>({
+      query: ({ todolistId, title }) => {
+        return {
+          method: 'post',
+          url: `/todo-lists/${todolistId}/tasks`,
+          body: { title },
+        }
+      },
+      invalidatesTags: ['Task'],
+    }),
+    deleteTask: build.mutation<
+      ResponseWithEmptyObject,
+      {
+        todolistId: DomainTodolist['id']
+        taskId: DomainTask['id']
+      }
+    >({
+      query: (payload) => {
+        const { todolistId, taskId } = payload
+        return {
+          method: 'delete',
+          url: `/todo-lists/${todolistId}/tasks/${taskId}`,
+        }
+      },
+      invalidatesTags: ['Task'],
+    }),
+    updateTask: build.mutation<ResponseWithItemTask, DomainTask>({
+      query: (updatedTask) => {
+        const model: UpdateTaskModel = {
+          description: updatedTask.description,
+          status: updatedTask.status,
+          title: updatedTask.title,
+          priority: updatedTask.priority,
+          startDate: updatedTask.startDate,
+          deadline: updatedTask.deadline,
+        }
+        return {
+          method: 'put',
+          url: `/todo-lists/${updatedTask.todoListId}/tasks/${updatedTask.id}`,
+          body: model,
+        }
+      },
+      invalidatesTags: ['Task'],
+    }),
+  }),
+})
+
+export const { useGetTasksQuery, useCreateTaskMutation, useDeleteTaskMutation, useUpdateTaskMutation } = tasksApi
+
+export const _tasksApi = {
   getTasks(todolistId: DomainTodolist['id']) {
     return instance.get<GetTasksResponse>(`/todo-lists/${todolistId}/tasks`)
   },

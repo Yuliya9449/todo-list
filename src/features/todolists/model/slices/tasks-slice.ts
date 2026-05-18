@@ -1,6 +1,6 @@
 import type { DomainTodolist } from '@/features/todolists/model/slices/todolists-slice'
 import { createTodolistTC, deleteTodolistTC } from '@/features/todolists/model/slices/todolists-slice'
-import { tasksApi } from '@/features/todolists/api/tasksApi'
+import { _tasksApi } from '@/features/todolists/api/tasksApi'
 import {
   type DomainTask,
   getTasksResponseSchema,
@@ -35,7 +35,7 @@ export const tasksSlice = createAppSlice({
       async (todolistId: DomainTodolist['id'], { dispatch, rejectWithValue }) => {
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
-          const { data } = await tasksApi.getTasks(todolistId)
+          const { data } = await _tasksApi.getTasks(todolistId)
           getTasksResponseSchema.parse(data) // 💎 zod
           dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
           return { todolistId, tasks: data.items }
@@ -61,7 +61,7 @@ export const tasksSlice = createAppSlice({
       ) => {
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
-          const { data } = await tasksApi.createTask(arg)
+          const { data } = await _tasksApi.createTask(arg)
           responseWithItemTaskSchema.parse(data) // 💎 zod
           if (data.resultCode === ResultCode.Success) {
             dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
@@ -95,7 +95,7 @@ export const tasksSlice = createAppSlice({
       ) => {
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
-          const { data } = await tasksApi.deleteTask(arg)
+          const { data } = await _tasksApi.deleteTask(arg)
           responseWithEmptyObjectSchema.parse(data) // 💎 zod
           if (data.resultCode === ResultCode.Success) {
             dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
@@ -129,7 +129,7 @@ export const tasksSlice = createAppSlice({
       async (updatedTask: DomainTask, { dispatch, rejectWithValue }) => {
         try {
           dispatch(setRequestStatusAC({ requestStatus: 'loading' }))
-          const { data } = await tasksApi.updateTask(updatedTask)
+          const { data } = await _tasksApi.updateTask(updatedTask)
           responseWithItemTaskSchema.parse(data) // 💎 zod
           if (data.resultCode === ResultCode.Success) {
             dispatch(setRequestStatusAC({ requestStatus: 'succeeded' }))
