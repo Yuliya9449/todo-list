@@ -21,6 +21,7 @@ import { useNavigate } from 'react-router'
 import { AUTH_TOKEN, RoutePath } from '@/common/constants'
 import { useLogoutMutation } from '@/features/auth/api/authApi'
 import { ResultCode } from '@/common/enums'
+import { baseApi } from '@/app/api/baseApi'
 
 export const Header = () => {
   const [logout] = useLogoutMutation()
@@ -50,6 +51,10 @@ export const Header = () => {
           dispatch(setIsLoggedInAC({ isLoggedIn: false }))
           dispatch(setLoginNameAC({ loginName: null }))
         }
+      })
+      .then(() => {
+        dispatch(baseApi.util.resetApiState())
+        // dispatch(baseApi.util.invalidateTags(['Todolist', 'Task']))
       })
     // .then(() => {
     //   return meQueryTrigger().unwrap()

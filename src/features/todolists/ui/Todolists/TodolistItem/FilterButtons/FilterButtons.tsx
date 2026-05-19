@@ -1,8 +1,9 @@
 import Grid from '@mui/material/Grid'
 import Button from '@mui/material/Button'
-import { changeTodolistFilterAC, type FilterValues } from '@/features/todolists/model/slices/todolists-slice'
-import { useAppDispatch } from '@/common/hooks'
 import type { DomainTodolist } from '@/features/todolists/model/slices/todolists-slice'
+import { type FilterValues } from '@/features/todolists/model/slices/todolists-slice'
+import { useAppDispatch } from '@/common/hooks'
+import { todolistsApi } from '@/features/todolists/api/todolistsApi'
 
 type Props = {
   todolist: DomainTodolist
@@ -12,33 +13,38 @@ export const FilterButtons = ({ todolist }: Props) => {
   const { id, filter } = todolist
   const dispatch = useAppDispatch()
 
-  const changeFilter = (filter: FilterValues) => {
-    dispatch(changeTodolistFilterAC({ todolistId: id, filter }))
+  const changeTodolistFilter = (filter: FilterValues) => {
+    dispatch(
+      todolistsApi.util.updateQueryData('getTodolists', undefined, (draftTodolists) => {
+        const todolist = draftTodolists.find((t) => t.id === id)
+        if (todolist) {
+          todolist.filter = filter
+        }
+      }),
+    )
+    // dispatch(changeTodolistFilterAC({ todolistId: id, filter }))
   }
 
   return (
-    <Grid
-      container
-      spacing={2}
-    >
+    <Grid container spacing={2}>
       <Button
         variant={filter === 'all' ? 'outlined' : 'text'}
         color={'inherit'}
-        onClick={() => changeFilter('all')}
+        onClick={() => changeTodolistFilter('all')}
       >
         All
       </Button>
       <Button
         variant={filter === 'active' ? 'outlined' : 'text'}
         color={'primary'}
-        onClick={() => changeFilter('active')}
+        onClick={() => changeTodolistFilter('active')}
       >
         Active
       </Button>
       <Button
         variant={filter === 'completed' ? 'outlined' : 'text'}
         color={'secondary'}
-        onClick={() => changeFilter('completed')}
+        onClick={() => changeTodolistFilter('completed')}
       >
         Completed
       </Button>
