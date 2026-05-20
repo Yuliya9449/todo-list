@@ -1,5 +1,8 @@
 import type { RequestStatus } from '@/common/types'
 import { createAppSlice } from '@/common/utils'
+import { isFulfilled, isPending, isRejected } from '@reduxjs/toolkit/react'
+import { todolistsApi } from '@/features/todolists/api/todolistsApi'
+import { tasksApi } from '@/features/todolists/api/tasksApi'
 
 export const appSlice = createAppSlice({
   name: 'app',
@@ -39,6 +42,23 @@ export const appSlice = createAppSlice({
       state.auth.loginName = action.payload.loginName
     }),
   }),
+  extraReducers: (builder) =>
+    builder
+      .addMatcher(isPending, (state, action) => {
+        if (
+          todolistsApi.endpoints.getTodolists.matchPending(action) ||
+          tasksApi.endpoints.getTasks.matchPending(action)
+        ) {
+          return
+        }
+        state.requestStatus = 'loading'
+      })
+      .addMatcher(isFulfilled, (state) => {
+        state.requestStatus = 'succeeded'
+      })
+      .addMatcher(isRejected, (state) => {
+        state.requestStatus = 'failed'
+      }),
 })
 
 export const { changeThemeModeAC, setRequestStatusAC, setAppErrorAC, setIsLoggedInAC, setLoginNameAC } =
