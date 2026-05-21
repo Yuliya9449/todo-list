@@ -1,6 +1,5 @@
 import Grid from '@mui/material/Grid'
 import { EditableSpan } from '@/common/components/EditableSpan/EditableSpan'
-import { type DomainTodolist } from '@/features/todolists/model/slices/todolists-slice'
 import { DeleteButton } from '@/common/components/DeleteButton/DeleteButton'
 import {
   todolistsApi,
@@ -9,6 +8,7 @@ import {
 } from '@/features/todolists/api/todolistsApi'
 import { useAppDispatch } from '@/common/hooks'
 import { ResultCode } from '@/common/enums'
+import type { DomainTodolist } from '@/features/todolists/lib/types'
 
 type Props = {
   todolist: DomainTodolist

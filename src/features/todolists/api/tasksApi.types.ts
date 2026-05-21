@@ -1,5 +1,5 @@
 import * as z from 'zod'
-import { domainTaskSchema } from '@/features/todolists/model/schemas'
+import { domainTaskSchema } from '@/features/todolists/lib/schemas'
 import { createResponseSchema } from '@/common/types'
 
 export const getTasksResponseSchema = z.object({

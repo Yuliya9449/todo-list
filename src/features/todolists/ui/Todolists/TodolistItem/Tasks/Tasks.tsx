@@ -1,10 +1,10 @@
 import List from '@mui/material/List'
 import { TaskItem } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TaskItem/TaskItem'
-import type { DomainTodolist, FilterValues } from '@/features/todolists/model/slices/todolists-slice'
 import type { DomainTask } from '@/features/todolists/api/tasksApi.types'
 import { TaskStatus } from '@/common/enums'
 import { useGetTasksQuery } from '@/features/todolists/api/tasksApi'
 import { TasksSkeleton } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TasksSkeleton/TasksSkeleton'
+import type { DomainTodolist, FilterValues } from '@/features/todolists/lib/types'
 
 type Props = {
   todolist: DomainTodolist
@@ -27,6 +27,19 @@ export const Tasks = ({ todolist }: Props) => {
   const { data, isLoading } = useGetTasksQuery(todolist.id)
 
   const filteredTasks = getFilteredTasks(data?.items, todolist.filter)
+
+  // useEffect(() => {
+  //   if (!error) return
+  //
+  //   if ('status' in error) {
+  //     //  FetchBaseQueryError
+  //     const errorMessage = 'error' in error ? error.error : JSON.stringify(error.data)
+  //     dispatch(setAppErrorAC({ errorMessage }))
+  //   } else {
+  //     // SerializedError
+  //     dispatch(setAppErrorAC({ errorMessage: error.message || 'Unexpected error' }))
+  //   }
+  // }, [dispatch, error])
 
   if (isLoading) {
     return <TasksSkeleton />

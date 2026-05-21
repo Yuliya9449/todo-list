@@ -1,9 +1,8 @@
 import Grid from '@mui/material/Grid'
 import Button from '@mui/material/Button'
-import type { DomainTodolist } from '@/features/todolists/model/slices/todolists-slice'
-import { type FilterValues } from '@/features/todolists/model/slices/todolists-slice'
 import { useAppDispatch } from '@/common/hooks'
 import { todolistsApi } from '@/features/todolists/api/todolistsApi'
+import type { DomainTodolist, FilterValues } from '@/features/todolists/lib/types'
 
 type Props = {
   todolist: DomainTodolist
@@ -22,7 +21,6 @@ export const FilterButtons = ({ todolist }: Props) => {
         }
       }),
     )
-    // dispatch(changeTodolistFilterAC({ todolistId: id, filter }))
   }
 
   return (

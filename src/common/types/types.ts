@@ -16,7 +16,11 @@ export const createResponseSchema = <T extends z.ZodType>(dataSchema: T) =>
 
 export type ApiResponse<T extends z.ZodType> = z.infer<ReturnType<typeof createResponseSchema<T>>>
 
-export const responseWithEmptyObjectSchema = createResponseSchema(z.object({}))
+export const responseWithAnyObjectSchema = createResponseSchema(z.looseObject({}))
+
+export type ResponseWithAnyObject = z.infer<typeof responseWithAnyObjectSchema>
+
+export const responseWithEmptyObjectSchema = createResponseSchema(z.strictObject({}))
 
 export type ResponseWithEmptyObject = z.infer<typeof responseWithEmptyObjectSchema>
 

@@ -4,10 +4,10 @@ import { EditableSpan } from '@/common/components/EditableSpan/EditableSpan'
 import { type ChangeEvent, useCallback } from 'react'
 import { DeleteButton } from '@/common/components/DeleteButton/DeleteButton'
 import { getListItemSx } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TaskItem/TaskItem.styles'
-import type { DomainTodolist } from '@/features/todolists/model/slices/todolists-slice'
 import type { DomainTask } from '@/features/todolists/api/tasksApi.types'
 import { TaskStatus } from '@/common/enums'
 import { useDeleteTaskMutation, useUpdateTaskMutation } from '@/features/todolists/api/tasksApi'
+import type { DomainTodolist } from '@/features/todolists/lib/types'
 
 type Props = {
   todolist: DomainTodolist
