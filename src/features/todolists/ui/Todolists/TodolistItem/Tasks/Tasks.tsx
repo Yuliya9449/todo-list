@@ -28,19 +28,6 @@ export const Tasks = ({ todolist }: Props) => {
 
   const filteredTasks = getFilteredTasks(data?.items, todolist.filter)
 
-  // useEffect(() => {
-  //   if (!error) return
-  //
-  //   if ('status' in error) {
-  //     //  FetchBaseQueryError
-  //     const errorMessage = 'error' in error ? error.error : JSON.stringify(error.data)
-  //     dispatch(setAppErrorAC({ errorMessage }))
-  //   } else {
-  //     // SerializedError
-  //     dispatch(setAppErrorAC({ errorMessage: error.message || 'Unexpected error' }))
-  //   }
-  // }, [dispatch, error])
-
   if (isLoading) {
     return <TasksSkeleton />
   }

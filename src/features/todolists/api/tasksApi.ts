@@ -1,4 +1,3 @@
-import { instance } from '@/common/instance'
 import type {
   DomainTask,
   GetTasksResponse,
@@ -13,7 +12,7 @@ export const tasksApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getTasks: build.query<GetTasksResponse, DomainTodolist['id']>({
       query: (todolistId) => `/todo-lists/${todolistId}/tasks`,
-      providesTags: ['Task'],
+      providesTags: (_res, _err, todolistId) => [{ type: 'Task', id: todolistId }],
     }),
     createTask: build.mutation<ResponseWithItemTask, { todolistId: DomainTodolist['id']; title: DomainTask['title'] }>({
       query: ({ todolistId, title }) => {
@@ -23,7 +22,7 @@ export const tasksApi = baseApi.injectEndpoints({
           body: { title },
         }
       },
-      invalidatesTags: ['Task'],
+      invalidatesTags: (_res, _err, { todolistId }) => [{ type: 'Task', id: todolistId }],
     }),
     deleteTask: build.mutation<
       ResponseWithEmptyObject,
@@ -32,14 +31,13 @@ export const tasksApi = baseApi.injectEndpoints({
         taskId: DomainTask['id']
       }
     >({
-      query: (payload) => {
-        const { todolistId, taskId } = payload
+      query: ({ todolistId, taskId }) => {
         return {
           method: 'delete',
           url: `/todo-lists/${todolistId}/tasks/${taskId}`,
         }
       },
-      invalidatesTags: ['Task'],
+      invalidatesTags: (_res, _err, { todolistId }) => [{ type: 'Task', id: todolistId }],
     }),
     updateTask: build.mutation<ResponseWithItemTask, DomainTask>({
       query: (updatedTask) => {
@@ -57,35 +55,9 @@ export const tasksApi = baseApi.injectEndpoints({
           body: model,
         }
       },
-      invalidatesTags: ['Task'],
+      invalidatesTags: (_res, _err, { todoListId }) => [{ type: 'Task', id: todoListId }],
     }),
   }),
 })
 
 export const { useGetTasksQuery, useCreateTaskMutation, useDeleteTaskMutation, useUpdateTaskMutation } = tasksApi
-
-export const _tasksApi = {
-  getTasks(todolistId: DomainTodolist['id']) {
-    return instance.get<GetTasksResponse>(`/todo-lists/${todolistId}/tasks`)
-  },
-  createTask(payload: { todolistId: DomainTodolist['id']; title: DomainTask['title'] }) {
-    const { todolistId, title } = payload
-    return instance.post<ResponseWithItemTask>(`/todo-lists/${todolistId}/tasks`, { title })
-  },
-  deleteTask(payload: { todolistId: DomainTodolist['id']; taskId: DomainTask['id'] }) {
-    const { todolistId, taskId } = payload
-    return instance.delete<ResponseWithEmptyObject>(`/todo-lists/${todolistId}/tasks/${taskId}`)
-  },
-  updateTask(updatedTask: DomainTask) {
-    const model: UpdateTaskModel = {
-      description: updatedTask.description,
-      status: updatedTask.status,
-      title: updatedTask.title,
-      priority: updatedTask.priority,
-      startDate: updatedTask.startDate,
-      deadline: updatedTask.deadline,
-    }
-
-    return instance.put<ResponseWithItemTask>(`/todo-lists/${updatedTask.todoListId}/tasks/${updatedTask.id}`, model)
-  },
-}
