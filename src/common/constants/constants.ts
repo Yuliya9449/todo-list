@@ -6,3 +6,5 @@ export const RoutePath = {
   Faq: '/faq',
   NotFound: '*',
 } as const
+
+export const PAGE_SIZE = 4

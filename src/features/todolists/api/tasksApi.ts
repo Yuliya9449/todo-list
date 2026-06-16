@@ -7,21 +7,24 @@ import type {
 import type { ResponseWithEmptyObject } from '@/common/types'
 import { baseApi } from '@/app/api/baseApi'
 import type { DomainTodolist } from '@/features/todolists/lib/types'
+import { PAGE_SIZE } from '@/common/constants'
 
 export const tasksApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    getTasks: build.query<GetTasksResponse, DomainTodolist['id']>({
-      query: (todolistId) => `/todo-lists/${todolistId}/tasks`,
-      providesTags: (_res, _err, todolistId) => [{ type: 'Task', id: todolistId }],
+    getTasks: build.query<GetTasksResponse, { todolistId: DomainTodolist['id']; params: { page: number } }>({
+      query: ({ todolistId, params }) => ({
+        url: `/todo-lists/${todolistId}/tasks`,
+        params: { ...params, count: PAGE_SIZE },
+      }),
+      providesTags: (_res, _err, { todolistId }) => [{ type: 'Task', id: todolistId }],
+      keepUnusedDataFor: 30,
     }),
     createTask: build.mutation<ResponseWithItemTask, { todolistId: DomainTodolist['id']; title: DomainTask['title'] }>({
-      query: ({ todolistId, title }) => {
-        return {
-          method: 'post',
-          url: `/todo-lists/${todolistId}/tasks`,
-          body: { title },
-        }
-      },
+      query: ({ todolistId, title }) => ({
+        method: 'post',
+        url: `/todo-lists/${todolistId}/tasks`,
+        body: { title },
+      }),
       invalidatesTags: (_res, _err, { todolistId }) => [{ type: 'Task', id: todolistId }],
     }),
     deleteTask: build.mutation<

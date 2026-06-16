@@ -5,6 +5,8 @@ import { TaskStatus } from '@/common/enums'
 import { useGetTasksQuery } from '@/features/todolists/api/tasksApi'
 import { TasksSkeleton } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TasksSkeleton/TasksSkeleton'
 import type { DomainTodolist, FilterValues } from '@/features/todolists/lib/types'
+import { TasksPagination } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TasksPagination/TasksPagination'
+import { useState } from 'react'
 
 type Props = {
   todolist: DomainTodolist
@@ -24,7 +26,17 @@ const getFilteredTasks = (tasks: DomainTask[] | undefined, filter: FilterValues)
 }
 
 export const Tasks = ({ todolist }: Props) => {
-  const { data, isLoading } = useGetTasksQuery(todolist.id)
+  const [page, setPage] = useState(1)
+
+  const { data, isLoading } = useGetTasksQuery(
+    {
+      todolistId: todolist.id,
+      params: { page },
+    },
+    {
+      refetchOnFocus: true,
+    },
+  )
 
   const filteredTasks = getFilteredTasks(data?.items, todolist.filter)
 
@@ -43,6 +55,7 @@ export const Tasks = ({ todolist }: Props) => {
           })}
         </List>
       )}
+      <TasksPagination page={page} setPage={setPage} totalCount={data?.totalCount || 0} />
     </>
   )
 }
