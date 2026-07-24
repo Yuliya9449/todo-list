@@ -1,4 +1,4 @@
-import { useAppDispatch, useAppSelector } from '@/common/hooks'
+import { useAppSelector } from '@/common/hooks'
 import Button from '@mui/material/Button'
 import Checkbox from '@mui/material/Checkbox'
 import FormControl from '@mui/material/FormControl'
@@ -6,24 +6,20 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import FormGroup from '@mui/material/FormGroup'
 import FormLabel from '@mui/material/FormLabel'
 import TextField from '@mui/material/TextField'
-import { selectThemeMode, setIsLoggedInAC, setLoginNameAC } from '@/app/model/app-slice'
+import { selectThemeMode } from '@/app/model/app-slice'
 import { getTheme } from '@/common/theme/theme'
 import Grid from '@mui/material/Grid'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { type LoginInputs, loginSchema } from '@/features/auth/model/schemas'
-import { useLazyMeQuery, useLoginMutation } from '@/features/auth/api/authApi'
+import { useLoginMutation } from '@/features/auth/api/authApi'
 import { ResultCode } from '@/common/enums'
-import { AUTH_TOKEN } from '@/common/constants'
 
 export const Login = () => {
   const [login] = useLoginMutation()
-  const [meQueryTrigger] = useLazyMeQuery()
 
   const themeMode = useAppSelector(selectThemeMode)
   const theme = getTheme(themeMode)
-
-  const dispatch = useAppDispatch()
 
   const {
     handleSubmit,
@@ -44,24 +40,9 @@ export const Login = () => {
       .unwrap()
       .then((responseData) => {
         if (responseData.resultCode === ResultCode.Success) {
-          dispatch(setIsLoggedInAC({ isLoggedIn: true }))
-          localStorage.setItem(AUTH_TOKEN, responseData.data.token)
           // ! в responseData ещё userId
           reset()
         }
-      })
-      .then(() => {
-        return meQueryTrigger().unwrap()
-      })
-      .then((data) => {
-        if (data?.resultCode === ResultCode.Success) {
-          dispatch(setIsLoggedInAC({ isLoggedIn: true }))
-          dispatch(setLoginNameAC({ loginName: data.data.login }))
-        } else {
-          dispatch(setIsLoggedInAC({ isLoggedIn: false }))
-          dispatch(setLoginNameAC({ loginName: null }))
-        }
-        // ! одна и та же логика в App.tsx, Login.tsx, Header.tsx
       })
   }
 

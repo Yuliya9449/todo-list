@@ -6,30 +6,22 @@ import MenuIcon from '@mui/icons-material/Menu'
 import { NavButton } from '@/common/components/NavButton/NavButton'
 import Switch from '@mui/material/Switch'
 import LinearProgress from '@mui/material/LinearProgress'
-import {
-  changeThemeModeAC,
-  selectIsLoggedIn,
-  selectLoginName,
-  selectRequestStatus,
-  selectThemeMode,
-  setIsLoggedInAC,
-  setLoginNameAC,
-} from '@/app/model/app-slice'
+import { changeThemeModeAC, selectRequestStatus, selectThemeMode } from '@/app/model/app-slice'
 import { useAppDispatch, useAppSelector } from '@/common/hooks'
 import { getTheme } from '@/common/theme/theme'
 import { useNavigate } from 'react-router'
-import { AUTH_TOKEN, RoutePath } from '@/common/constants'
-import { useLogoutMutation } from '@/features/auth/api/authApi'
+import { RoutePath } from '@/common/constants'
+import { useLogoutMutation, useMeQuery } from '@/features/auth/api/authApi'
 import { ResultCode } from '@/common/enums'
-import { baseApi } from '@/app/api/baseApi'
 
 export const Header = () => {
+  const { data, isLoading } = useMeQuery()
+
+  const isLoggedIn = data?.resultCode === ResultCode.Success && !isLoading
+
   const [logout] = useLogoutMutation()
-  // const [meQueryTrigger] = useLazyMeQuery()
 
   const requestStatus = useAppSelector(selectRequestStatus)
-  const isLoggedIn = useAppSelector(selectIsLoggedIn)
-  const loginName = useAppSelector(selectLoginName)
   const themeMode = useAppSelector(selectThemeMode)
 
   const dispatch = useAppDispatch()
@@ -44,31 +36,6 @@ export const Header = () => {
 
   const logoutHandler = () => {
     logout()
-      .unwrap()
-      .then((response) => {
-        if (response.resultCode === ResultCode.Success) {
-          localStorage.removeItem(AUTH_TOKEN)
-          dispatch(setIsLoggedInAC({ isLoggedIn: false }))
-          dispatch(setLoginNameAC({ loginName: null }))
-        }
-      })
-      .then(() => {
-        dispatch(baseApi.util.resetApiState())
-        // dispatch(baseApi.util.invalidateTags(['Todolist', 'Task']))
-      })
-    // .then(() => {
-    //   return meQueryTrigger().unwrap()
-    // })
-    // .then((data) => {
-    //   if (data?.resultCode === ResultCode.Success) {
-    //     dispatch(setIsLoggedInAC({ isLoggedIn: true }))
-    //     dispatch(setLoginNameAC({ loginName: data.data.login }))
-    //   } else {
-    //     dispatch(setIsLoggedInAC({ isLoggedIn: false }))
-    //     dispatch(setLoginNameAC({ loginName: null }))
-    //   }
-    //   // ! одна и та же логика в App.tsx, Login.tsx, Header.tsx
-    // })
   }
 
   return (
@@ -79,7 +46,7 @@ export const Header = () => {
             <MenuIcon />
           </IconButton>
           <div>
-            <span style={{ marginRight: '16px' }}>{loginName || 'User'}</span>
+            <span style={{ marginRight: '16px' }}>{data?.data.login || 'User'}</span>
             <NavButton onClick={() => navigate(RoutePath.Main)}>Todolists</NavButton>
             <NavButton onClick={() => navigate(RoutePath.Faq)} background={theme.palette.primary.dark}>
               Faq

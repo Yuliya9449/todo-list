@@ -4,7 +4,7 @@ import { handleFetchBaseQueryError } from '@/common/utils'
 
 export const baseApi = createApi({
   reducerPath: 'baseApi',
-  tagTypes: ['Todolist', 'Task'],
+  tagTypes: ['Todolist', 'Task', 'Auth'],
   baseQuery: async (args, api, extraOptions) => {
     const result = await fetchBaseQuery({
       baseUrl: import.meta.env.VITE_BASE_URL,
@@ -21,7 +21,6 @@ export const baseApi = createApi({
     })(args, api, extraOptions)
 
     handleFetchBaseQueryError({ result, dispatch: api.dispatch })
-
     return result
   },
   // keepUnusedDataFor: 300,
