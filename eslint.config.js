@@ -20,15 +20,17 @@ export default defineConfig([
     },
     rules: {
       'no-console': ['error', { allow: ['warn', 'error'] }], // Предупреждать о console.log, но разрешить warn и error
-      'no-debugger': 'warn', // предупреждение о debugger
-      'no-unused-vars': 'warn', // Отключаем базовое правило (неиспользуемые переменные)
+      'no-debugger': 'error', // предупреждение о debugger
       'no-useless-assignment': 'warn',
+      'no-unused-vars': 'off', // Отключаем базовое правило (неиспользуемые переменные)
       '@typescript-eslint/no-unused-vars': [
+        // и включаем здесь
         'warn',
         {
           argsIgnorePattern: '^_', // Игнорировать параметры, начинающиеся с _
           varsIgnorePattern: '^_', // Игнорировать переменные, начинающиеся с _
           caughtErrorsIgnorePattern: '^_', // Игнорировать ошибки в catch, начинающиеся с _
+          destructuredArrayIgnorePattern: '^_',
         },
       ],
       '@typescript-eslint/no-explicit-any': 'warn', // any запрещён

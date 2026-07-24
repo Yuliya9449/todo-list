@@ -9,6 +9,29 @@ import { baseApi } from '@/app/api/baseApi'
 import type { DomainTodolist } from '@/features/todolists/lib/types'
 import { PAGE_SIZE } from '@/common/constants'
 
+const applyOptimisticUpdate = async (
+  todolistId: string,
+  { getState, dispatch, queryFulfilled }: any, // MutationLifecycleApi, RTK Query не экспортирует type MutationLifecycleApi
+  callback: (draft: GetTasksResponse) => void,
+) => {
+  const cachedArgs = tasksApi.util.selectCachedArgsForQuery(getState(), 'getTasks')
+  const relevantArgs = cachedArgs.filter((arg) => arg.todolistId === todolistId)
+  const createPatchResult = (arg: {
+    todolistId: DomainTodolist['id']
+    params: {
+      page: number
+    }
+  }) => dispatch(tasksApi.util.updateQueryData('getTasks', arg, callback))
+
+  const patchResults = relevantArgs.map((arg) => createPatchResult(arg))
+
+  try {
+    await queryFulfilled
+  } catch {
+    patchResults.forEach((p) => p.undo())
+  }
+}
+
 export const tasksApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getTasks: build.query<GetTasksResponse, { todolistId: DomainTodolist['id']; params: { page: number } }>({
@@ -16,7 +39,7 @@ export const tasksApi = baseApi.injectEndpoints({
         url: `/todo-lists/${todolistId}/tasks`,
         params: { ...params, count: PAGE_SIZE },
       }),
-      providesTags: (_res, _err, { todolistId }) => [{ type: 'Task', id: todolistId }],
+      providesTags: (_res, _err, { todolistId }) => [{ type: 'Task', id: todolistId }, 'Task'],
       keepUnusedDataFor: 30,
     }),
     createTask: build.mutation<ResponseWithItemTask, { todolistId: DomainTodolist['id']; title: DomainTask['title'] }>({
@@ -40,6 +63,15 @@ export const tasksApi = baseApi.injectEndpoints({
           url: `/todo-lists/${todolistId}/tasks/${taskId}`,
         }
       },
+      onQueryStarted: ({ todolistId, taskId }, mutationLifeCycleApi) => {
+        return applyOptimisticUpdate(todolistId, mutationLifeCycleApi, (draft) => {
+          const index = draft.items.findIndex((task) => task.id === taskId)
+          if (index !== -1) {
+            draft.items.splice(index, 1)
+          }
+        })
+      },
+
       invalidatesTags: (_res, _err, { todolistId }) => [{ type: 'Task', id: todolistId }],
     }),
     updateTask: build.mutation<ResponseWithItemTask, DomainTask>({
@@ -57,6 +89,15 @@ export const tasksApi = baseApi.injectEndpoints({
           url: `/todo-lists/${updatedTask.todoListId}/tasks/${updatedTask.id}`,
           body: model,
         }
+      },
+      onQueryStarted: (updatedTask, mutationLifeCycleApi) => {
+        const { todoListId, id } = updatedTask
+        return applyOptimisticUpdate(todoListId, mutationLifeCycleApi, (draft) => {
+          const index = draft.items.findIndex((task) => task.id === id)
+          if (index !== -1) {
+            draft.items[index] = { ...updatedTask }
+          }
+        })
       },
       invalidatesTags: (_res, _err, { todoListId }) => [{ type: 'Task', id: todoListId }],
     }),
