@@ -1,6 +1,5 @@
 import { PAGE_SIZE } from '@/common/constants'
 import Pagination from '@mui/material/Pagination'
-import Typography from '@mui/material/Typography'
 import type { ChangeEvent } from 'react'
 import styles from './TasksPagination.module.css'
 
@@ -25,9 +24,6 @@ export const TasksPagination = ({ page, setPage, totalCount }: Props) => {
         color="primary"
         className={styles.pagination}
       />
-      <div className={styles.totalCount}>
-        <Typography variant="caption">Total: {totalCount}</Typography>
-      </div>
     </>
   )
 }

@@ -1,34 +1,23 @@
 import List from '@mui/material/List'
 import { TaskItem } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TaskItem/TaskItem'
-import type { DomainTask } from '@/features/todolists/api/tasksApi.types'
-import { TaskStatus } from '@/common/enums'
-import { useGetTasksQuery } from '@/features/todolists/api/tasksApi'
+import { useDeleteTaskMutation, useGetTasksQuery } from '@/features/todolists/api/tasksApi'
 import { TasksSkeleton } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TasksSkeleton/TasksSkeleton'
-import type { DomainTodolist, FilterValues } from '@/features/todolists/lib/types'
+import type { DomainTodolist } from '@/features/todolists/lib/types'
 import { TasksPagination } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TasksPagination/TasksPagination'
 import { useState } from 'react'
+import { PAGE_SIZE } from '@/common/constants'
+import styles from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TasksPagination/TasksPagination.module.css'
+import Typography from '@mui/material/Typography'
 
 type Props = {
   todolist: DomainTodolist
 }
 
-const getFilteredTasks = (tasks: DomainTask[] | undefined, filter: FilterValues) => {
-  if (!tasks) return
-
-  switch (filter) {
-    case 'active':
-      return tasks.filter((task) => task.status === TaskStatus.New)
-    case 'completed':
-      return tasks.filter((task) => task.status === TaskStatus.Completed)
-    default:
-      return tasks
-  }
-}
-
 export const Tasks = ({ todolist }: Props) => {
   const [page, setPage] = useState(1)
+  const [deleteTask] = useDeleteTaskMutation()
 
-  const { data, isLoading } = useGetTasksQuery(
+  const { data: tasksData, isLoading } = useGetTasksQuery(
     {
       todolistId: todolist.id,
       params: { page },
@@ -38,7 +27,22 @@ export const Tasks = ({ todolist }: Props) => {
     },
   )
 
-  const filteredTasks = getFilteredTasks(data?.items, todolist.filter)
+  const tasks = tasksData?.items || []
+  const totalCount = tasksData?.totalCount || 0
+
+  const deleteTaskHandler = async (taskId: string) => {
+    try {
+      await deleteTask({ todolistId: todolist.id, taskId }).unwrap()
+
+      if (page > 1 && tasks.length === 1) {
+        setPage((prev) => prev - 1)
+      }
+    } catch (error) {
+      console.error('Failed to delete task:', error)
+    }
+  }
+
+  const hasNextPage = totalCount > PAGE_SIZE
 
   if (isLoading) {
     return <TasksSkeleton />
@@ -46,16 +50,21 @@ export const Tasks = ({ todolist }: Props) => {
 
   return (
     <>
-      {filteredTasks?.length === 0 ? (
+      {tasks.length === 0 ? (
         <p>Tasks are absent</p>
       ) : (
         <List>
-          {filteredTasks?.map((task) => {
-            return <TaskItem key={task.id} todolist={todolist} task={task} />
+          {tasks.map((task) => {
+            return <TaskItem key={task.id} todolist={todolist} task={task} deleteTask={deleteTaskHandler} />
           })}
         </List>
       )}
-      <TasksPagination page={page} setPage={setPage} totalCount={data?.totalCount || 0} />
+
+      {hasNextPage && <TasksPagination page={page} setPage={setPage} totalCount={totalCount} />}
+
+      <div className={styles.totalCount}>
+        <Typography variant="caption">Total: {totalCount}</Typography>
+      </div>
     </>
   )
 }

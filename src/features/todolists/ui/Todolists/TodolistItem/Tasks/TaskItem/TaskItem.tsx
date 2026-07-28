@@ -6,21 +6,17 @@ import { DeleteButton } from '@/common/components/DeleteButton/DeleteButton'
 import { getListItemSx } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TaskItem/TaskItem.styles'
 import type { DomainTask } from '@/features/todolists/api/tasksApi.types'
 import { TaskStatus } from '@/common/enums'
-import { useDeleteTaskMutation, useUpdateTaskMutation } from '@/features/todolists/api/tasksApi'
+import { useUpdateTaskMutation } from '@/features/todolists/api/tasksApi'
 import type { DomainTodolist } from '@/features/todolists/lib/types'
 
 type Props = {
   todolist: DomainTodolist
   task: DomainTask
+  deleteTask: (taskId: string) => void
 }
 
-export const TaskItem = ({ todolist, task }: Props) => {
-  const [deleteTask] = useDeleteTaskMutation()
+export const TaskItem = ({ todolist, task, deleteTask }: Props) => {
   const [updateTask] = useUpdateTaskMutation()
-
-  const deleteTaskHandler = useCallback(() => {
-    deleteTask({ todolistId: todolist.id, taskId: task.id })
-  }, [deleteTask, task.id, todolist.id])
 
   const changeTaskStatus = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
@@ -47,7 +43,7 @@ export const TaskItem = ({ todolist, task }: Props) => {
         <Checkbox onChange={changeTaskStatus} checked={isTaskCompleted} disabled={todolist.isDisabled} />
         <EditableSpan value={task.title} onChangeValue={changeTaskTitle} disabled={todolist.isDisabled} />
       </div>
-      <DeleteButton onClick={deleteTaskHandler} disabled={todolist.isDisabled} />
+      <DeleteButton onClick={() => deleteTask(task.id)} disabled={todolist.isDisabled} />
     </ListItem>
   )
 }
