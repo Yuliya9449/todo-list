@@ -14,9 +14,12 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { type LoginInputs, loginSchema } from '@/features/auth/model/schemas'
 import { useLoginMutation } from '@/features/auth/api/authApi'
 import { ResultCode } from '@/common/enums'
+import { useLazyGetCaptchaQuery } from '@/features/captcha/api/captchaApi'
 
 export const Login = () => {
-  const [login] = useLoginMutation()
+  const [login, { isLoading: isLoginLoading }] = useLoginMutation()
+
+  const [triggerGetCaptcha, { data: captchaData, isLoading: isCaptchaLoading }] = useLazyGetCaptchaQuery()
 
   const themeMode = useAppSelector(selectThemeMode)
   const theme = getTheme(themeMode)
@@ -24,6 +27,7 @@ export const Login = () => {
   const {
     handleSubmit,
     reset,
+    setError,
     formState: { errors },
     control,
   } = useForm<LoginInputs>({
@@ -31,6 +35,7 @@ export const Login = () => {
       email: '',
       password: '',
       rememberMe: false,
+      captcha: '',
     },
     resolver: zodResolver(loginSchema),
   })
@@ -42,6 +47,12 @@ export const Login = () => {
         if (responseData.resultCode === ResultCode.Success) {
           // ! в responseData ещё userId
           reset()
+        } else if (responseData.resultCode === ResultCode.CaptchaError) {
+          setError('captcha', {
+            type: 'manual',
+            message: responseData.messages[0],
+          })
+          triggerGetCaptcha()
         }
       })
   }
@@ -68,9 +79,30 @@ export const Login = () => {
           <p>
             <b>Password:</b> free
           </p>
+          {captchaData?.url && (
+            <div>
+              {isCaptchaLoading ? <span>captcha is loading... </span> : <img src={captchaData.url} alt="Captcha" />}
+            </div>
+          )}
         </FormLabel>
         <form onSubmit={handleSubmit(submitHandler)}>
           <FormGroup>
+            {captchaData?.url && (
+              <Controller
+                name="captcha"
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    type="text"
+                    label="Captcha"
+                    error={!!errors.captcha}
+                    helperText={errors.captcha?.message}
+                    margin="normal"
+                  />
+                )}
+              />
+            )}
             <Controller
               name="email"
               control={control}
@@ -90,19 +122,17 @@ export const Login = () => {
             <Controller
               name="password"
               control={control}
-              render={({ field }) => {
-                return (
-                  <TextField
-                    {...field}
-                    type="password"
-                    label="Password"
-                    error={!!errors.password}
-                    helperText={errors.password?.message}
-                    margin="normal"
-                    autoComplete="current-password"
-                  />
-                )
-              }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  type="password"
+                  label="Password"
+                  error={!!errors.password}
+                  helperText={errors.password?.message}
+                  margin="normal"
+                  autoComplete="current-password"
+                />
+              )}
             />
 
             <FormControlLabel
@@ -120,8 +150,9 @@ export const Login = () => {
               type="submit"
               variant="contained"
               color="primary"
+              disabled={isLoginLoading}
             >
-              Login
+              {isLoginLoading ? 'Logging in...' : 'Login'}
             </Button>
           </FormGroup>
         </form>
