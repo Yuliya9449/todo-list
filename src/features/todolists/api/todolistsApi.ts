@@ -69,6 +69,26 @@ export const todolistsApi = baseApi.injectEndpoints({
       // invalidatesTags: ['Todolist'],
       invalidatesTags: (_result, _error, { id }) => [{ type: 'Todolist' as const, id }],
     }),
+    reorderTodolist: build.mutation<
+      ResponseWithEmptyObject,
+      {
+        id: DomainTodolist['id']
+        newOrder: DomainTodolist[]
+        body: { putAfterItemId: string | null }
+      }
+    >({
+      query: ({ id, body }) => ({
+        method: 'put',
+        url: `/todo-lists/${id}/reorder`,
+        body,
+      }),
+      onQueryStarted: ({ newOrder }, mutationLifeCycleApi) => {
+        return applyOptimisticUpdate(mutationLifeCycleApi, (_draftTodolists) => {
+          return newOrder
+        })
+      },
+      invalidatesTags: ['Todolist'],
+    }),
   }),
 })
 
@@ -77,4 +97,5 @@ export const {
   useAddTodolistMutation,
   useDeleteTodolistMutation,
   useChangeTodolistTitleMutation,
+  useReorderTodolistMutation,
 } = todolistsApi
