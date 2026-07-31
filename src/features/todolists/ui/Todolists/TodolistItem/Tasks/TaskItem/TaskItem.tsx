@@ -1,7 +1,7 @@
 import ListItem from '@mui/material/ListItem'
 import Checkbox from '@mui/material/Checkbox'
 import { EditableSpan } from '@/common/components/EditableSpan/EditableSpan'
-import { type ChangeEvent, useCallback } from 'react'
+import { type ChangeEvent, forwardRef, useCallback } from 'react'
 import { DeleteButton } from '@/common/components/DeleteButton/DeleteButton'
 import { getListItemSx } from '@/features/todolists/ui/Todolists/TodolistItem/Tasks/TaskItem/TaskItem.styles'
 import type { DomainTask } from '@/features/todolists/api/tasksApi.types'
@@ -15,7 +15,7 @@ type Props = {
   deleteTask: (taskId: string) => void
 }
 
-export const TaskItem = ({ todolist, task, deleteTask }: Props) => {
+export const TaskItem = forwardRef<HTMLLIElement, Props>(({ todolist, task, deleteTask }, ref) => {
   const [updateTask] = useUpdateTaskMutation()
 
   const changeTaskStatus = useCallback(
@@ -38,7 +38,7 @@ export const TaskItem = ({ todolist, task, deleteTask }: Props) => {
   const isTaskCompleted = task.status === TaskStatus.Completed
 
   return (
-    <ListItem sx={getListItemSx(isTaskCompleted)}>
+    <ListItem ref={ref} sx={getListItemSx(isTaskCompleted)}>
       <div>
         <Checkbox onChange={changeTaskStatus} checked={isTaskCompleted} disabled={todolist.isDisabled} />
         <EditableSpan value={task.title} onChangeValue={changeTaskTitle} disabled={todolist.isDisabled} />
@@ -46,4 +46,4 @@ export const TaskItem = ({ todolist, task, deleteTask }: Props) => {
       <DeleteButton onClick={() => deleteTask(task.id)} disabled={todolist.isDisabled} />
     </ListItem>
   )
-}
+})

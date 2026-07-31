@@ -95,13 +95,44 @@ export const tasksApi = baseApi.injectEndpoints({
         return applyOptimisticUpdate(todoListId, mutationLifeCycleApi, (draft) => {
           const index = draft.items.findIndex((task) => task.id === id)
           if (index !== -1) {
-            draft.items[index] = { ...updatedTask }
+            Object.assign(draft.items[index], updatedTask)
+            // draft.items[index] = { ...updatedTask }
           }
         })
       },
       invalidatesTags: (_res, _err, { todoListId }) => [{ type: 'Task', id: todoListId }],
     }),
+    reorderTask: build.mutation<
+      ResponseWithEmptyObject,
+      {
+        todolistId: DomainTodolist['id']
+        taskId: DomainTask['id']
+        newOrder: DomainTask[]
+        body: { putAfterItemId: string | null }
+      }
+    >({
+      query: ({ todolistId, taskId, body }) => {
+        return {
+          method: 'put',
+          url: `/todo-lists/${todolistId}/tasks/${taskId}/reorder`,
+          body,
+        }
+      },
+      onQueryStarted: ({ todolistId, newOrder }, mutationLifeCycleApi) => {
+        return applyOptimisticUpdate(todolistId, mutationLifeCycleApi, (draftTasks) => {
+          draftTasks.items = newOrder
+        })
+      },
+
+      invalidatesTags: (_res, _err, { todolistId }) => [{ type: 'Task', id: todolistId }],
+    }),
   }),
 })
 
-export const { useGetTasksQuery, useCreateTaskMutation, useDeleteTaskMutation, useUpdateTaskMutation } = tasksApi
+export const {
+  useGetTasksQuery,
+  useCreateTaskMutation,
+  useDeleteTaskMutation,
+  useUpdateTaskMutation,
+  useReorderTaskMutation,
+} = tasksApi
