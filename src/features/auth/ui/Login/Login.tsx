@@ -9,20 +9,33 @@ import TextField from '@mui/material/TextField'
 import { selectThemeMode } from '@/app/model/app-slice'
 import { getTheme } from '@/common/theme/theme'
 import Grid from '@mui/material/Grid'
+import InputAdornment from '@mui/material/InputAdornment'
+import IconButton from '@mui/material/IconButton'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { type LoginInputs, loginSchema } from '@/features/auth/model/schemas'
 import { useLoginMutation } from '@/features/auth/api/authApi'
 import { ResultCode } from '@/common/enums'
 import { useLazyGetCaptchaQuery } from '@/features/captcha/api/captchaApi'
+import Visibility from '@mui/icons-material/Visibility'
+import VisibilityOff from '@mui/icons-material/VisibilityOff'
+import { useState } from 'react'
 
 export const Login = () => {
+  const [showPassword, setShowPassword] = useState(false)
   const [login, { isLoading: isLoginLoading }] = useLoginMutation()
 
   const [triggerGetCaptcha, { data: captchaData, isLoading: isCaptchaLoading }] = useLazyGetCaptchaQuery()
 
   const themeMode = useAppSelector(selectThemeMode)
   const theme = getTheme(themeMode)
+
+  const handleClickShowPassword = () => setShowPassword((show) => !show)
+
+  // Предотвращает потерю фокуса поля ввода при клике на иконку
+  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.preventDefault()
+  }
 
   const {
     handleSubmit,
@@ -125,12 +138,30 @@ export const Login = () => {
               render={({ field }) => (
                 <TextField
                   {...field}
-                  type="password"
+                  // type="password"
+                  type={showPassword ? 'text' : 'password'}
                   label="Password"
                   error={!!errors.password}
                   helperText={errors.password?.message}
                   margin="normal"
                   autoComplete="current-password"
+                  slotProps={{
+                    input: {
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label={showPassword ? 'hide the password' : 'display the password'}
+                            onClick={handleClickShowPassword}
+                            onMouseDown={handleMouseDownPassword}
+                            edge="end"
+                            tabIndex={-1}
+                          >
+                            {showPassword ? <VisibilityOff /> : <Visibility />}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    },
+                  }}
                 />
               )}
             />
