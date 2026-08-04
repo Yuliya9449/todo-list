@@ -20,9 +20,9 @@ export const appSlice = createAppSlice({
     changeThemeModeAC: create.reducer<{ themeMode: ThemeMode }>((state, action) => {
       state.themeMode = action.payload.themeMode
     }),
-    setRequestStatusAC: create.reducer<{ requestStatus: RequestStatus }>((state, action) => {
-      state.requestStatus = action.payload.requestStatus
-    }),
+    // setRequestStatusAC: create.reducer<{ requestStatus: RequestStatus }>((state, action) => {
+    //   state.requestStatus = action.payload.requestStatus
+    // }),
     setAppErrorAC: create.reducer<{ errorMessage: ErrorMessage }>((state, action) => {
       state.error = action.payload.errorMessage
     }),
@@ -41,12 +41,18 @@ export const appSlice = createAppSlice({
       .addMatcher(isFulfilled, (state) => {
         state.requestStatus = 'succeeded'
       })
-      .addMatcher(isRejected, (state) => {
+      .addMatcher(isRejected, (state, action) => {
         state.requestStatus = 'failed'
+        // todo any
+        const customError = action.payload as any
+
+        if (customError?.status === 'CUSTOM_ERROR') {
+          state.error = `${customError.error || 'Ошибка валидации данных (Zod)'}, смотри консоль`
+        }
       }),
 })
 
-export const { changeThemeModeAC, setRequestStatusAC, setAppErrorAC } = appSlice.actions
+export const { changeThemeModeAC, setAppErrorAC } = appSlice.actions
 export const { selectThemeMode, selectRequestStatus, selectAppError } = appSlice.selectors
 export const appReducer = appSlice.reducer
 

@@ -1,7 +1,13 @@
-import type { ResponseWithItemTodolist, Todolist } from '@/features/todolists/api/todolistsApi.types'
-import type { ResponseWithEmptyObject } from '@/common/types'
+import {
+  responseWithItemTodolistSchema,
+  type Todolist,
+  todolistSchema,
+} from '@/features/todolists/api/todolistsApi.types'
+import { responseWithEmptyObjectSchema } from '@/common/types'
 import { baseApi } from '@/app/api/baseApi'
-import type { DomainTodolist } from '@/features/todolists/lib/types'
+import { type DomainTodolist, domainTodolistSchema } from '@/features/todolists/lib/types'
+import { withZodValidator } from '@/common/utils'
+import * as z from 'zod'
 
 const applyOptimisticUpdate = async (
   { dispatch, queryFulfilled }: any,
@@ -10,7 +16,12 @@ const applyOptimisticUpdate = async (
   const patchResult = dispatch(todolistsApi.util.updateQueryData('getTodolists', undefined, callback))
   try {
     await queryFulfilled
-  } catch {
+    // todo any
+  } catch (error: any) {
+    if (error?.error?.status === 'CUSTOM_ERROR') {
+      console.warn('Zod validation failed, but server succeeded. Skipping undo.')
+      return // НЕ делаем откат, так как сервер всё удалил/создал успешно
+    }
     patchResult.undo()
   }
 }
@@ -22,20 +33,23 @@ export const todolistsApi = baseApi.injectEndpoints({
       transformResponse: (todolists: Todolist[]) => {
         return todolists.map((t) => ({ ...t, filter: 'all', isDisabled: false }))
       },
+      rawResponseSchema: z.array(todolistSchema),
+      ...withZodValidator(z.array(domainTodolistSchema)),
       providesTags: (result) => {
         return result ? [...result.map((t) => ({ type: 'Todolist' as const, id: t.id })), 'Todolist'] : ['Todolist']
       },
     }),
-    addTodolist: build.mutation<ResponseWithItemTodolist, Todolist['title']>({
-      query: (title) => ({
+    addTodolist: build.mutation({
+      query: (title: Todolist['title']) => ({
         method: 'post',
         url: '/todo-lists',
         body: { title },
       }),
+      ...withZodValidator(responseWithItemTodolistSchema),
       invalidatesTags: ['Todolist'],
     }),
-    deleteTodolist: build.mutation<ResponseWithEmptyObject, DomainTodolist['id']>({
-      query: (id) => ({
+    deleteTodolist: build.mutation({
+      query: (id: DomainTodolist['id']) => ({
         method: 'delete',
         url: `/todo-lists/${id}`,
       }),
@@ -47,13 +61,11 @@ export const todolistsApi = baseApi.injectEndpoints({
           }
         })
       },
+      ...withZodValidator(responseWithEmptyObjectSchema),
       invalidatesTags: (_result, _error, id) => [{ type: 'Todolist', id }],
     }),
-    changeTodolistTitle: build.mutation<
-      ResponseWithEmptyObject,
-      { id: DomainTodolist['id']; title: DomainTodolist['title'] }
-    >({
-      query: ({ id, title }) => ({
+    changeTodolistTitle: build.mutation({
+      query: ({ id, title }: { id: DomainTodolist['id']; title: DomainTodolist['title'] }) => ({
         method: 'put',
         url: `/todo-lists/${id}`,
         body: { title },
@@ -66,18 +78,19 @@ export const todolistsApi = baseApi.injectEndpoints({
           }
         })
       },
+      ...withZodValidator(responseWithEmptyObjectSchema),
       // invalidatesTags: ['Todolist'],
       invalidatesTags: (_result, _error, { id }) => [{ type: 'Todolist' as const, id }],
     }),
-    reorderTodolist: build.mutation<
-      ResponseWithEmptyObject,
-      {
+    reorderTodolist: build.mutation({
+      query: ({
+        id,
+        body,
+      }: {
         id: DomainTodolist['id']
         newOrder: DomainTodolist[]
         body: { putAfterItemId: string | null }
-      }
-    >({
-      query: ({ id, body }) => ({
+      }) => ({
         method: 'put',
         url: `/todo-lists/${id}/reorder`,
         body,
@@ -87,6 +100,7 @@ export const todolistsApi = baseApi.injectEndpoints({
           return newOrder
         })
       },
+      ...withZodValidator(responseWithEmptyObjectSchema),
       invalidatesTags: ['Todolist'],
     }),
   }),

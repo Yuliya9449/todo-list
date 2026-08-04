@@ -1,8 +1,12 @@
-import type { Todolist } from '@/features/todolists/api/todolistsApi.types'
+import * as z from 'zod'
+import { todolistSchema } from '@/features/todolists/api/todolistsApi.types'
 
-export type DomainTodolist = Todolist & {
-  filter: FilterValues
-  isDisabled: boolean
-}
+export const filterValuesSchema = z.literal(['all', 'active', 'completed'])
+export type FilterValues = z.infer<typeof filterValuesSchema>
 
-export type FilterValues = 'all' | 'active' | 'completed'
+export const domainTodolistSchema = todolistSchema.extend({
+  filter: filterValuesSchema,
+  isDisabled: z.boolean(),
+})
+
+export type DomainTodolist = z.infer<typeof domainTodolistSchema>
