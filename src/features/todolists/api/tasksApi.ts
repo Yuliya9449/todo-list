@@ -1,13 +1,15 @@
-import type {
-  DomainTask,
-  GetTasksResponse,
-  ResponseWithItemTask,
-  UpdateTaskModel,
+import {
+  type DomainTask,
+  type GetTasksResponse,
+  getTasksResponseSchema,
+  responseWithItemTaskSchema,
+  type UpdateTaskModel,
 } from '@/features/todolists/api/tasksApi.types'
-import type { ResponseWithEmptyObject } from '@/common/types'
+import { responseWithEmptyObjectSchema } from '@/common/types'
 import { baseApi } from '@/app/api/baseApi'
-import type { DomainTodolist } from '@/features/todolists/lib/types'
+import { type DomainTodolist } from '@/features/todolists/lib/types'
 import { PAGE_SIZE } from '@/common/constants'
+import { withZodValidator } from '@/common/utils'
 
 const applyOptimisticUpdate = async (
   todolistId: string,
@@ -27,37 +29,38 @@ const applyOptimisticUpdate = async (
 
   try {
     await queryFulfilled
-  } catch {
+    // todo any
+  } catch (error: any) {
+    if (error?.error?.status === 'CUSTOM_ERROR') {
+      console.warn('Zod validation failed, but server succeeded. Skipping undo.')
+      return // НЕ делаем откат, так как сервер всё удалил/создал успешно
+    }
     patchResults.forEach((p) => p.undo())
   }
 }
 
 export const tasksApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    getTasks: build.query<GetTasksResponse, { todolistId: DomainTodolist['id']; params: { page: number } }>({
-      query: ({ todolistId, params }) => ({
+    getTasks: build.query({
+      query: ({ todolistId, params }: { todolistId: DomainTodolist['id']; params: { page: number } }) => ({
         url: `/todo-lists/${todolistId}/tasks`,
         params: { ...params, count: PAGE_SIZE },
       }),
+      ...withZodValidator(getTasksResponseSchema),
       providesTags: (_res, _err, { todolistId }) => [{ type: 'Task', id: todolistId }, 'Task'],
       keepUnusedDataFor: 30,
     }),
-    createTask: build.mutation<ResponseWithItemTask, { todolistId: DomainTodolist['id']; title: DomainTask['title'] }>({
-      query: ({ todolistId, title }) => ({
+    createTask: build.mutation({
+      query: ({ todolistId, title }: { todolistId: DomainTodolist['id']; title: DomainTask['title'] }) => ({
         method: 'post',
         url: `/todo-lists/${todolistId}/tasks`,
         body: { title },
       }),
+      ...withZodValidator(responseWithItemTaskSchema),
       invalidatesTags: (_res, _err, { todolistId }) => [{ type: 'Task', id: todolistId }],
     }),
-    deleteTask: build.mutation<
-      ResponseWithEmptyObject,
-      {
-        todolistId: DomainTodolist['id']
-        taskId: DomainTask['id']
-      }
-    >({
-      query: ({ todolistId, taskId }) => {
+    deleteTask: build.mutation({
+      query: ({ todolistId, taskId }: { todolistId: DomainTodolist['id']; taskId: DomainTask['id'] }) => {
         return {
           method: 'delete',
           url: `/todo-lists/${todolistId}/tasks/${taskId}`,
@@ -71,11 +74,11 @@ export const tasksApi = baseApi.injectEndpoints({
           }
         })
       },
-
+      ...withZodValidator(responseWithEmptyObjectSchema),
       invalidatesTags: (_res, _err, { todolistId }) => [{ type: 'Task', id: todolistId }],
     }),
-    updateTask: build.mutation<ResponseWithItemTask, DomainTask>({
-      query: (updatedTask) => {
+    updateTask: build.mutation({
+      query: (updatedTask: DomainTask) => {
         const model: UpdateTaskModel = {
           description: updatedTask.description,
           status: updatedTask.status,
@@ -100,18 +103,20 @@ export const tasksApi = baseApi.injectEndpoints({
           }
         })
       },
+      ...withZodValidator(responseWithItemTaskSchema),
       invalidatesTags: (_res, _err, { todoListId }) => [{ type: 'Task', id: todoListId }],
     }),
-    reorderTask: build.mutation<
-      ResponseWithEmptyObject,
-      {
+    reorderTask: build.mutation({
+      query: ({
+        todolistId,
+        taskId,
+        body,
+      }: {
         todolistId: DomainTodolist['id']
         taskId: DomainTask['id']
         newOrder: DomainTask[]
         body: { putAfterItemId: string | null }
-      }
-    >({
-      query: ({ todolistId, taskId, body }) => {
+      }) => {
         return {
           method: 'put',
           url: `/todo-lists/${todolistId}/tasks/${taskId}/reorder`,
@@ -123,7 +128,7 @@ export const tasksApi = baseApi.injectEndpoints({
           draftTasks.items = newOrder
         })
       },
-
+      ...withZodValidator(responseWithEmptyObjectSchema),
       invalidatesTags: (_res, _err, { todolistId }) => [{ type: 'Task', id: todolistId }],
     }),
   }),
