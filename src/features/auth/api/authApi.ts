@@ -1,18 +1,19 @@
-import type { LoginInputs } from '@/features/auth/model/schemas'
-import type { LoginResponse, MeResponse } from '@/features/auth/api/authApi.types'
-import type { ResponseWithEmptyObject } from '@/common/types'
+import { type LoginInputs, loginResponseSchema, meResponseSchema } from '@/features/auth/model/schemas'
+import { type ResponseWithEmptyObject, responseWithEmptyObjectSchema } from '@/common/types'
 import { baseApi } from '@/app/api/baseApi'
 import { AUTH_TOKEN } from '@/common/constants'
 import { ResultCode } from '@/common/enums'
+import { withZodValidator } from '@/common/utils'
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    me: build.query<MeResponse, void>({
+    me: build.query({
       query: () => '/auth/me',
+      ...withZodValidator(meResponseSchema),
       providesTags: ['Auth'],
     }),
-    login: build.mutation<LoginResponse, LoginInputs>({
-      query: (body) => ({
+    login: build.mutation({
+      query: (body: LoginInputs) => ({
         method: 'post',
         url: '/auth/login',
         body,
@@ -24,6 +25,7 @@ export const authApi = baseApi.injectEndpoints({
           dispatch(authApi.util.invalidateTags(['Auth']))
         }
       },
+      ...withZodValidator(loginResponseSchema),
     }),
     logout: build.mutation<ResponseWithEmptyObject, void>({
       query: () => ({
@@ -38,6 +40,7 @@ export const authApi = baseApi.injectEndpoints({
           dispatch(baseApi.util.resetApiState())
         }
       },
+      ...withZodValidator(responseWithEmptyObjectSchema),
     }),
   }),
 })
